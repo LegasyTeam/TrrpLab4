@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TrrpLab4.Properties
+namespace WindowsFormsApp1.Properties
 {
 
 
