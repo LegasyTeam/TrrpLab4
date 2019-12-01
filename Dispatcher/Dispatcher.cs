@@ -18,6 +18,7 @@ namespace Dispatcher
         private Thread ListenThread;
         private int LifeTimeToDrop = 10;
         private int CleanUpPeriodMilliseconds=5000;
+        private int currentservnumber = 0;//индекс сервера из списка серверов, ip которого диспетчер вернет следующему клиенту
         private bool listening=true;//когда будет false, диспатчер перестанет слушать сообщения
         private System.Timers.Timer CleanUpTimer;
         private IPAddress getmyip()//ищем IPv4
@@ -43,9 +44,11 @@ namespace Dispatcher
         }
         public EndPoint getServ()
         {
+            if (currentservnumber == int.MaxValue)
+                currentservnumber = 0;//на случай переполнения
             if (CourseServers.Count > 0)
-                return CourseServers.First().Key;
-            return null;
+                return CourseServers.ElementAt(currentservnumber++%CourseServers.Count).Key;
+            else return null;
         }
         public string addServ(IPEndPoint ep)
         {
@@ -91,7 +94,7 @@ namespace Dispatcher
             }
             while (handler.Available > 0);
             EndPoint REP = handler.RemoteEndPoint;
-            Console.WriteLine("(" + DateTime.Now.ToShortTimeString() + ")(" + REP.ToString() + ")" + ": " + builder.ToString());
+            Console.WriteLine("(" + DateTime.Now.ToLongTimeString() + ")(" + REP.ToString() + ")" + ": " + builder.ToString());
             string message;
             if (builder.ToString().StartsWith("CourseServer"))
             {
