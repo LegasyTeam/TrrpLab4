@@ -118,7 +118,7 @@ namespace CourseServer
 
         private SQLiteConnection createDB()
         {
-            SQLiteConnection.CreateFile("currentCourse.db");
+            
             var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
 
@@ -130,13 +130,16 @@ namespace CourseServer
                                                     [date] DATETIME, 
                                                     [curse] DOUBLE);", db);
             cmd.ExecuteNonQuery();
-            var data = di.EnumValutes(true).Tables[0];
+            var data = di.EnumValutes(false).Tables[0];
             for (int i = 0; i < data.Rows.Count; i++)
             {
                 var row = data.Rows[i];
-                if (((string)row.ItemArray.GetValue(0)).Equals("R01235") || ((string)row.ItemArray.GetValue(0)).Equals("R01239"))
+
+                var s =((string)row.ItemArray.GetValue(0)).Trim(' ');
+                var s1 =((string)row.ItemArray.GetValue(1)).Trim(' ');
+                if (s.Equals("R01235") || s.Equals("R01239"))
                 {
-                    cmd.CommandText = "Insert into Valute (name, code) (@name, @code)";
+                    cmd.CommandText = "Insert into Valute (name, code) VALUES (@name, @code)";
                     cmd.Parameters.Add(new SQLiteParameter("@name", (string)row.ItemArray.GetValue(1)));
                     cmd.Parameters.Add(new SQLiteParameter("@code", (string)row.ItemArray.GetValue(0)));
                     cmd.ExecuteNonQuery();
@@ -227,12 +230,15 @@ namespace CourseServer
             try
             {
                 db = new SQLiteConnection("Data Source=currentCourse.db");
+                db.Open();
+                SQLiteCommand cmd1 = new SQLiteCommand("Select code From Valute", db);
+                cmd1.ExecuteNonQuery();
             }
             catch {
                 db = createDB();
             }
            
-            db.Open();
+            
             SQLiteCommand cmd = new SQLiteCommand("Select code From Valute", db);
             var list = new List<string>(); 
             using (var reader = cmd.ExecuteReader())
