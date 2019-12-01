@@ -7,11 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Sockets;
+using System.IO.Ports;
+using System.Timers;
+using System.Configuration;
+using System.ServiceModel;
+using Newtonsoft.Json;
 
 namespace WindowsFormsApp1
 {
     public partial class MainForm : Form
     {
+        private string Address { get; set; }
         private string login { get; set; }
         private string token { get; set; }
         private int usdRub;
@@ -78,8 +86,12 @@ namespace WindowsFormsApp1
             InitializeComponent();
             this.login = _login;
             this.token = _token;
+            InitializeAddress();
             InitializeCourses();
             InitializeWallet();
+            cbBuy.SelectedIndex = 0;
+            cbSell.SelectedIndex = 0;
+            //MessageBox.Show(Address);
         }
 
         private void InitializeCourses()
@@ -87,7 +99,35 @@ namespace WindowsFormsApp1
             UsdRub = 3550;
             EurRub = 4325;
         }
-
+        private void InitializeAddress()
+        {
+            try
+            {
+                IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(ConfigurationManager.AppSettings["dispatcherAddress"]), int.Parse(ConfigurationManager.AppSettings["dispatcherPort"]));
+                Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);    
+                // подключаемся к удаленному хосту
+                socket.Connect(ipPoint);
+                string message = "Client";
+                byte[] data = Encoding.Unicode.GetBytes(message);
+                socket.Send(data);    // получаем ответ
+                data = new byte[256]; // буфер для ответа
+                StringBuilder builder = new StringBuilder();
+                int bytes = 0; // количество полученных байт
+                do
+                {
+                    bytes = socket.Receive(data, data.Length, 0);
+                    builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                }
+                while (socket.Available > 0);
+                Address = builder.ToString();            // закрываем сокет
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Не удалось поключиться к диспетчеру, проверьте соединение.");
+            }
+        }
         private void InitializeWallet()
         {
             //имитация получения с сервера
@@ -102,8 +142,8 @@ namespace WindowsFormsApp1
         private void MainForm_Load(object sender, EventArgs e)
         {
             this.Text = "Программа для обмена валют - " + login;
-            cbExchFrom.SelectedIndex = 0;
-            cbExchTo.SelectedIndex = 1;
+            cbBuy.SelectedIndex = 0;
+            cbSell.SelectedIndex = 1;
         }
 
         private void tbExchFrom_KeyPress(object sender, KeyPressEventArgs e)
@@ -117,71 +157,78 @@ namespace WindowsFormsApp1
 
         private void tbExchFrom_TextChanged(object sender, EventArgs e)
         {
-            int temp;
-            int.TryParse(tbExchFrom.Text, out temp);
-            if (cbExchFrom.SelectedIndex == 0)
-            {
-                if (temp > RubWallet / 100)
-                    temp = RubWallet / 100;
-            }
-            else if (cbExchFrom.SelectedIndex == 1)
-            {
-                if (temp > UsdWallet / 100)
-                    temp = UsdWallet;
-            }
-            else
-            {
-                if (temp > EurWallet / 100)
-                    temp = EurWallet;
-            }
-            tbExchFrom.Text = temp.ToString();
 
-            if (cbExchFrom.SelectedIndex == 0)
-            {
-                if (cbExchTo.SelectedIndex == 1)
-                {
-                    tbExchTo.Text = (temp * 100 / usdRub).ToString();
-                }
-                else if (cbExchTo.SelectedIndex == 2)
-                {
-                    tbExchTo.Text = (temp * 100 / eurRub ).ToString();
-                }
-            }
-            else if (cbExchFrom.SelectedIndex == 1)
-            {
-                if (cbExchTo.SelectedIndex == 0)
-                {
-                    tbExchTo.Text = (temp * usdRub).ToString();
-                    if (tbExchTo.Text.Length > 2)
-                        tbExchTo.Text = tbExchTo.Text.Substring(0, tbExchTo.Text.Length - 2) + "," + tbExchTo.Text.Substring(tbExchTo.Text.Length - 2, 2);
-                }
-                else if (cbExchTo.SelectedIndex == 2)
-                {
-                    tbExchTo.Text = (temp * usdRub / eurRub).ToString();
-                }
-            }
-            else
-            {
-                if (cbExchTo.SelectedIndex == 0)
-                {
-                    tbExchTo.Text = (temp * eurRub).ToString();
-                    if (tbExchTo.Text.Length > 2)
-                        tbExchTo.Text = tbExchTo.Text.Substring(0, tbExchTo.Text.Length - 2) + "," + tbExchTo.Text.Substring(tbExchTo.Text.Length - 2, 2);
-                }
-                else if (cbExchTo.SelectedIndex == 1)
-                {
-                    tbExchTo.Text = (temp * eurRub / usdRub).ToString();
-                }
-            }
         }
 
         private void cbExchFrom_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbExchFrom.SelectedIndex == cbExchTo.SelectedIndex)
-                btnExch.Enabled = false;
+
+        }
+
+        private void tbBuyValue_TextChanged(object sender, EventArgs e)
+        {
+            int temp;
+            int.TryParse(tbBuyValue.Text, out temp);
+            tbBuyValue.Text = temp.ToString();
+            if (cbBuy.SelectedIndex == 0)
+            {
+                if (temp * UsdRub > RubWallet || temp == 0)
+                    btnBuy.Enabled = false;
+                else
+                    btnBuy.Enabled = true;
+            }
             else
-                btnExch.Enabled = true;
-            tbExchFrom_TextChanged(sender, e);
+            {
+                if (temp * EurRub > RubWallet || temp == 0)
+                    btnBuy.Enabled = false;
+                else
+                    btnBuy.Enabled = true;
+            }
+        }
+
+        private void tbSellValue_TextChanged(object sender, EventArgs e)
+        {
+            int temp;
+            int.TryParse(tbSellValue.Text, out temp);
+            tbSellValue.Text = temp.ToString();
+            if (cbSell.SelectedIndex == 0)
+            {
+                if (temp > UsdWallet || temp == 0)
+                    btnSell.Enabled = false;
+                else
+                    btnSell.Enabled = true;
+            }
+            else
+            {
+                if (temp > EurWallet || temp == 0)
+                    btnSell.Enabled = false;
+                else
+                    btnSell.Enabled = true;
+            }
+        }
+
+        private void btnBuy_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+                BasicHttpBinding binding = new BasicHttpBinding();
+                EndpointAddress ep = new EndpointAddress(address);
+                ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+                ICourseServer cs = factory.CreateChannel();
+                var userTran = new UserTransaction() { Dollar = true, Count = 10, Token = "c5a7c0d5_144e_11ea_bb7c_08606e6ce1c1" };
+                MessageBox.Show(cs.SellValute(JsonConvert.SerializeObject(userTran)));
+            }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+        }
+
+        private void btnSell_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void cbBuy_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tbBuyValue_TextChanged(sender, e);
         }
     }
 }

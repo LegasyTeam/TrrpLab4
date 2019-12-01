@@ -67,5 +67,13 @@ namespace WindowsFormsApp1
                 MessageBox.Show("Ошибка авторизации. Попробуйте войти позже.");
             }
         }
+
+        private void passwordTb_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                loginBtn_Click(sender, e);
+            }
+        }
     }
 }

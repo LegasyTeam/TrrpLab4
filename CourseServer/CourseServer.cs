@@ -73,7 +73,6 @@ namespace CourseServer
             try
             {
                 IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(DispatcherAddress), dispatcherport);
-
                 Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // подключаемся к удаленному хосту
                 socket.Connect(ipPoint);

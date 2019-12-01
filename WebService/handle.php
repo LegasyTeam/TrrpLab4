@@ -30,9 +30,10 @@ if (isset($_GET['action']))
 			{
 				if (mysqli_num_rows($res) == 0)
 				{
-					$res2 = mysqli_fetch_assoc(mysqli_query($connection, "SELECT REPLACE(UUID(),'-','_') as T"))['T'];
-					$res1 = mysqli_query($connection,"INSERT INTO `Users`(`login`, `prefix`, `hash`, `token`) VALUES ('{$_GET['login']}','{$_GET['prefix']}','{$_GET['hash']}', '{$res2}')");
-					echo $res2;
+					$res2 = mysqli_query($connection, "SELECT REPLACE(CAST(UUID() as char character set utf8), '-', '_')");
+					$res3 = mysqli_fetch_array($res2)[0];
+					$res1 = mysqli_query($connection,"INSERT INTO `Users`(`login`, `prefix`, `hash`, `token`) VALUES ('{$_GET['login']}','{$_GET['prefix']}','{$_GET['hash']}', '{$res3}')");
+					echo $res3;
 				}
 				else
 					{ echo "login_exists"; }

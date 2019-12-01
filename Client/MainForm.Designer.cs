@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.labelValHdr = new System.Windows.Forms.Label();
-            this.btnExch = new System.Windows.Forms.Button();
+            this.btnSell = new System.Windows.Forms.Button();
             this.labelUsdHdr = new System.Windows.Forms.Label();
             this.labelEurHdr = new System.Windows.Forms.Label();
             this.labelUsdVal = new System.Windows.Forms.Label();
@@ -49,10 +49,11 @@
             this.labelExchHdr2 = new System.Windows.Forms.Label();
             this.labelExchHdr3 = new System.Windows.Forms.Label();
             this.labelExchHdr = new System.Windows.Forms.Label();
-            this.tbExchTo = new System.Windows.Forms.TextBox();
-            this.cbExchTo = new System.Windows.Forms.ComboBox();
-            this.tbExchFrom = new System.Windows.Forms.TextBox();
-            this.cbExchFrom = new System.Windows.Forms.ComboBox();
+            this.tbSellValue = new System.Windows.Forms.TextBox();
+            this.cbSell = new System.Windows.Forms.ComboBox();
+            this.tbBuyValue = new System.Windows.Forms.TextBox();
+            this.cbBuy = new System.Windows.Forms.ComboBox();
+            this.btnBuy = new System.Windows.Forms.Button();
             this.gbCourse.SuspendLayout();
             this.gbWallet.SuspendLayout();
             this.gbExch.SuspendLayout();
@@ -68,14 +69,16 @@
             this.labelValHdr.TabIndex = 0;
             this.labelValHdr.Text = "Курсы валют";
             // 
-            // btnExch
+            // btnSell
             // 
-            this.btnExch.Location = new System.Drawing.Point(174, 152);
-            this.btnExch.Name = "btnExch";
-            this.btnExch.Size = new System.Drawing.Size(75, 23);
-            this.btnExch.TabIndex = 1;
-            this.btnExch.Text = "Обменять";
-            this.btnExch.UseVisualStyleBackColor = true;
+            this.btnSell.Enabled = false;
+            this.btnSell.Location = new System.Drawing.Point(329, 91);
+            this.btnSell.Name = "btnSell";
+            this.btnSell.Size = new System.Drawing.Size(75, 23);
+            this.btnSell.TabIndex = 1;
+            this.btnSell.Text = "Продать";
+            this.btnSell.UseVisualStyleBackColor = true;
+            this.btnSell.Click += new System.EventHandler(this.btnSell_Click);
             // 
             // labelUsdHdr
             // 
@@ -230,15 +233,16 @@
             // 
             // gbExch
             // 
+            this.gbExch.Controls.Add(this.btnBuy);
             this.gbExch.Controls.Add(this.labelExchHdr4);
             this.gbExch.Controls.Add(this.labelExchHdr2);
             this.gbExch.Controls.Add(this.labelExchHdr3);
             this.gbExch.Controls.Add(this.labelExchHdr);
-            this.gbExch.Controls.Add(this.tbExchTo);
-            this.gbExch.Controls.Add(this.cbExchTo);
-            this.gbExch.Controls.Add(this.tbExchFrom);
-            this.gbExch.Controls.Add(this.cbExchFrom);
-            this.gbExch.Controls.Add(this.btnExch);
+            this.gbExch.Controls.Add(this.tbSellValue);
+            this.gbExch.Controls.Add(this.cbSell);
+            this.gbExch.Controls.Add(this.tbBuyValue);
+            this.gbExch.Controls.Add(this.cbBuy);
+            this.gbExch.Controls.Add(this.btnSell);
             this.gbExch.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.gbExch.Location = new System.Drawing.Point(3, 274);
             this.gbExch.Name = "gbExch";
@@ -250,7 +254,7 @@
             // labelExchHdr4
             // 
             this.labelExchHdr4.AutoSize = true;
-            this.labelExchHdr4.Location = new System.Drawing.Point(191, 96);
+            this.labelExchHdr4.Location = new System.Drawing.Point(162, 96);
             this.labelExchHdr4.Name = "labelExchHdr4";
             this.labelExchHdr4.Size = new System.Drawing.Size(53, 13);
             this.labelExchHdr4.TabIndex = 9;
@@ -259,16 +263,16 @@
             // labelExchHdr2
             // 
             this.labelExchHdr2.AutoSize = true;
-            this.labelExchHdr2.Location = new System.Drawing.Point(98, 96);
+            this.labelExchHdr2.Location = new System.Drawing.Point(32, 96);
             this.labelExchHdr2.Name = "labelExchHdr2";
-            this.labelExchHdr2.Size = new System.Drawing.Size(21, 13);
+            this.labelExchHdr2.Size = new System.Drawing.Size(50, 13);
             this.labelExchHdr2.TabIndex = 8;
-            this.labelExchHdr2.Text = "На";
+            this.labelExchHdr2.Text = "Продать";
             // 
             // labelExchHdr3
             // 
             this.labelExchHdr3.AutoSize = true;
-            this.labelExchHdr3.Location = new System.Drawing.Point(191, 52);
+            this.labelExchHdr3.Location = new System.Drawing.Point(162, 52);
             this.labelExchHdr3.Name = "labelExchHdr3";
             this.labelExchHdr3.Size = new System.Drawing.Size(53, 13);
             this.labelExchHdr3.TabIndex = 7;
@@ -277,60 +281,68 @@
             // labelExchHdr
             // 
             this.labelExchHdr.AutoSize = true;
-            this.labelExchHdr.Location = new System.Drawing.Point(61, 52);
+            this.labelExchHdr.Location = new System.Drawing.Point(32, 52);
             this.labelExchHdr.Name = "labelExchHdr";
-            this.labelExchHdr.Size = new System.Drawing.Size(58, 13);
+            this.labelExchHdr.Size = new System.Drawing.Size(42, 13);
             this.labelExchHdr.TabIndex = 6;
-            this.labelExchHdr.Text = "Обменять";
+            this.labelExchHdr.Text = "Купить";
             // 
-            // tbExchTo
+            // tbSellValue
             // 
-            this.tbExchTo.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.tbExchTo.Location = new System.Drawing.Point(245, 93);
-            this.tbExchTo.Name = "tbExchTo";
-            this.tbExchTo.ReadOnly = true;
-            this.tbExchTo.Size = new System.Drawing.Size(92, 20);
-            this.tbExchTo.TabIndex = 5;
-            this.tbExchTo.Text = "0";
-            this.tbExchTo.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbExchFrom_KeyPress);
+            this.tbSellValue.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.tbSellValue.Location = new System.Drawing.Point(216, 93);
+            this.tbSellValue.Name = "tbSellValue";
+            this.tbSellValue.Size = new System.Drawing.Size(92, 20);
+            this.tbSellValue.TabIndex = 5;
+            this.tbSellValue.Text = "0";
+            this.tbSellValue.TextChanged += new System.EventHandler(this.tbSellValue_TextChanged);
+            this.tbSellValue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbExchFrom_KeyPress);
             // 
-            // cbExchTo
+            // cbSell
             // 
-            this.cbExchTo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbExchTo.FormattingEnabled = true;
-            this.cbExchTo.Items.AddRange(new object[] {
-            "RUB",
+            this.cbSell.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbSell.FormattingEnabled = true;
+            this.cbSell.Items.AddRange(new object[] {
             "USD",
             "EUR"});
-            this.cbExchTo.Location = new System.Drawing.Point(125, 93);
-            this.cbExchTo.Name = "cbExchTo";
-            this.cbExchTo.Size = new System.Drawing.Size(62, 21);
-            this.cbExchTo.TabIndex = 4;
-            this.cbExchTo.SelectedIndexChanged += new System.EventHandler(this.cbExchFrom_SelectedIndexChanged);
+            this.cbSell.Location = new System.Drawing.Point(96, 93);
+            this.cbSell.Name = "cbSell";
+            this.cbSell.Size = new System.Drawing.Size(62, 21);
+            this.cbSell.TabIndex = 4;
             // 
-            // tbExchFrom
+            // tbBuyValue
             // 
-            this.tbExchFrom.Location = new System.Drawing.Point(245, 49);
-            this.tbExchFrom.Name = "tbExchFrom";
-            this.tbExchFrom.Size = new System.Drawing.Size(92, 20);
-            this.tbExchFrom.TabIndex = 3;
-            this.tbExchFrom.Text = "0";
-            this.tbExchFrom.TextChanged += new System.EventHandler(this.tbExchFrom_TextChanged);
-            this.tbExchFrom.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbExchFrom_KeyPress);
+            this.tbBuyValue.Location = new System.Drawing.Point(216, 49);
+            this.tbBuyValue.Name = "tbBuyValue";
+            this.tbBuyValue.Size = new System.Drawing.Size(92, 20);
+            this.tbBuyValue.TabIndex = 3;
+            this.tbBuyValue.Text = "0";
+            this.tbBuyValue.TextChanged += new System.EventHandler(this.tbBuyValue_TextChanged);
+            this.tbBuyValue.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tbExchFrom_KeyPress);
             // 
-            // cbExchFrom
+            // cbBuy
             // 
-            this.cbExchFrom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbExchFrom.FormattingEnabled = true;
-            this.cbExchFrom.Items.AddRange(new object[] {
-            "RUB",
+            this.cbBuy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbBuy.FormattingEnabled = true;
+            this.cbBuy.Items.AddRange(new object[] {
             "USD",
             "EUR"});
-            this.cbExchFrom.Location = new System.Drawing.Point(125, 49);
-            this.cbExchFrom.Name = "cbExchFrom";
-            this.cbExchFrom.Size = new System.Drawing.Size(62, 21);
-            this.cbExchFrom.TabIndex = 2;
-            this.cbExchFrom.SelectedIndexChanged += new System.EventHandler(this.cbExchFrom_SelectedIndexChanged);
+            this.cbBuy.Location = new System.Drawing.Point(96, 49);
+            this.cbBuy.Name = "cbBuy";
+            this.cbBuy.Size = new System.Drawing.Size(62, 21);
+            this.cbBuy.TabIndex = 2;
+            this.cbBuy.SelectedIndexChanged += new System.EventHandler(this.cbBuy_SelectedIndexChanged);
+            // 
+            // btnBuy
+            // 
+            this.btnBuy.Enabled = false;
+            this.btnBuy.Location = new System.Drawing.Point(329, 46);
+            this.btnBuy.Name = "btnBuy";
+            this.btnBuy.Size = new System.Drawing.Size(75, 23);
+            this.btnBuy.TabIndex = 10;
+            this.btnBuy.Text = "Купить";
+            this.btnBuy.UseVisualStyleBackColor = true;
+            this.btnBuy.Click += new System.EventHandler(this.btnBuy_Click);
             // 
             // MainForm
             // 
@@ -365,7 +377,7 @@
         #endregion
 
         private System.Windows.Forms.Label labelValHdr;
-        private System.Windows.Forms.Button btnExch;
+        private System.Windows.Forms.Button btnSell;
         private System.Windows.Forms.Label labelUsdHdr;
         private System.Windows.Forms.Label labelEurHdr;
         private System.Windows.Forms.Label labelUsdVal;
@@ -382,12 +394,13 @@
         private System.Windows.Forms.GroupBox gbExch;
         private System.Windows.Forms.Label labelExchHdr3;
         private System.Windows.Forms.Label labelExchHdr;
-        private System.Windows.Forms.TextBox tbExchTo;
-        private System.Windows.Forms.ComboBox cbExchTo;
-        private System.Windows.Forms.TextBox tbExchFrom;
-        private System.Windows.Forms.ComboBox cbExchFrom;
+        private System.Windows.Forms.TextBox tbSellValue;
+        private System.Windows.Forms.ComboBox cbSell;
+        private System.Windows.Forms.TextBox tbBuyValue;
+        private System.Windows.Forms.ComboBox cbBuy;
         private System.Windows.Forms.Label labelExchHdr4;
         private System.Windows.Forms.Label labelExchHdr2;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnBuy;
     }
 }

@@ -83,6 +83,7 @@
             this.passwordTb.Size = new System.Drawing.Size(126, 20);
             this.passwordTb.TabIndex = 3;
             this.passwordTb.TextChanged += new System.EventHandler(this.loginTb_TextChanged);
+            this.passwordTb.KeyDown += new System.Windows.Forms.KeyEventHandler(this.passwordTb_KeyDown);
             // 
             // regBtn
             // 
