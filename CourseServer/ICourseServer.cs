@@ -12,8 +12,14 @@ namespace CourseServer
     interface ICourseServer
     {
         [OperationContract]
-        int GetCurrentCourse(int dollar);
+        double GetCurrentCourse(bool dollar);
         [OperationContract]
         string GetCurrenttCourse(DateTime from, DateTime to);
+        [OperationContract]
+        string BuyValute(string mass);
+        [OperationContract]
+        string SellValute(string mass);
+        [OperationContract]
+        string GetBalance(string token);
     }
 }
