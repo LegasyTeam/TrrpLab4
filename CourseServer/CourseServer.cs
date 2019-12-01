@@ -21,6 +21,9 @@ namespace CourseServer
         // адрес и порт сервера, к которому будем подключаться
         private int dispatcherport = 7000; // порт диспатчера
         private string DispatcherAddress = "26.29.23.251";//адрес диспатчера
+        //private int dispatcherport = 7000; // порт диспатчера
+        //private string DispatcherAddress = "26.29.23.251";//адрес диспатчера
+        //private string DispatcherAddress = "192.168.100.6";//адрес диспатчера
         private System.Timers.Timer ConnectToDispatcherTimer;//отсчитывает периоды в которые происходит связь с диспетчером
         private int DispatcherCallInterval = 5000;
         IPAddress myip;
