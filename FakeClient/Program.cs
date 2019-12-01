@@ -18,7 +18,7 @@ namespace FakeClient
             EndpointAddress ep = new EndpointAddress(address);
             ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
             ICourseServer cs = factory.CreateChannel();
-            Console.WriteLine(cs.GetCurrentCourse());
+            Console.WriteLine(cs.GetCurrenttCourse(DateTime.Now.AddDays(-3).Date, DateTime.Now.AddDays(-1).Date));
         }
     }
 }
