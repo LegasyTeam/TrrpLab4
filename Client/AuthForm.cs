@@ -42,17 +42,23 @@ namespace WindowsFormsApp1
         private void loginBtn_Click(object sender, EventArgs e)
         {
             string token = AuthReg.Auth(loginTb.Text, passwordTb.Text);
-            
             if (token != "")
             {
                 if (token == "auth_not_succ" || token == "incorrect_login")
                 {
                     MessageBox.Show("Неправильный логин или пароль");
                 }
+                else if (token == "no_server")
+                {
+                    MessageBox.Show("Сервер недоступен, проверьте соединение");
+                }
                 else
                 {
-                    MessageBox.Show(token);
-                    //MainForm.Show(token);
+                    //MessageBox.Show(token);
+                    MainForm mainForm = new MainForm(token, loginTb.Text);
+                    this.Hide();
+                    mainForm.ShowDialog();
+                    this.Close();
                 }
             }
   
