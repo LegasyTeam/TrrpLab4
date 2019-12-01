@@ -123,12 +123,10 @@ namespace CourseServer
             db.Open();
 
             SQLiteCommand cmd = new SQLiteCommand(@"CREATE TABLE [Valute](
-                                                    [id] INT PRIMARY KEY, 
                                                     [name] VARCHAR, 
                                                     [code] VARCHAR);
                                                     CREATE TABLE [Curses](
-                                                    [id] INT PRIMARY KEY, 
-                                                    [id_valute] INT, 
+                                                    [id_valute] INT64, 
                                                     [date] DATETIME, 
                                                     [curse] DOUBLE);", db);
             cmd.ExecuteNonQuery();
