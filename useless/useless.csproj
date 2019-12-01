@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B6884F12-6BD4-4C7B-B97A-AF0EBA90BFAD}</ProjectGuid>
+    <ProjectGuid>{2059D4A1-E9F3-4E41-B717-74071929E3E6}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CourseServer</RootNamespace>
-    <AssemblyName>CourseServer</AssemblyName>
+    <RootNamespace>useless</RootNamespace>
+    <AssemblyName>useless</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -35,7 +35,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,9 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CourseServer.cs" />
-    <Compile Include="CourseServerProgram.cs" />
-    <Compile Include="ICourseServer.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

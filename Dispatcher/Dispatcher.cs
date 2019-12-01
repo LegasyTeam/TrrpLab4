@@ -17,10 +17,10 @@ namespace Dispatcher
         private IPEndPoint ipPoint;
         private Thread ListenThread;
         private int LifeTimeToDrop = 10;
-        private int CleanUpPeriodMilliseconds=20000;
+        private int CleanUpPeriodMilliseconds=5000;
         private bool listening=true;//когда будет false, диспатчер перестанет слушать сообщения
         private System.Timers.Timer CleanUpTimer;
-        private IPAddress getmyip()
+        private IPAddress getmyip()//ищем IPv4
         {
             foreach (IPAddress a in Dns.GetHostAddresses(Dns.GetHostName()))
             {
@@ -47,20 +47,33 @@ namespace Dispatcher
                 return CourseServers.First().Key;
             return null;
         }
-        public void addServ(EndPoint ep)
+        public string addServ(IPEndPoint ep)
         {
             if (CourseServers.ContainsKey(ep))
+            {
                 CourseServers[ep] = DateTime.Now;
-            else CourseServers.Add(ep, DateTime.Now);
+                return "updated";
+            }
+            else
+            {
+                CourseServers.Add(ep, DateTime.Now);
+                return "added into server list";
+            }
         }
 
         private void RemoveNotRespondingServers(object sender, ElapsedEventArgs e)
         {
+            List<EndPoint> eplist = new List<EndPoint>();
             foreach (var a in CourseServers)
             {
-                if (a.Value.Second > LifeTimeToDrop)
-                    CourseServers.Remove(a.Key);//так можно?
+                if ((DateTime.Now-a.Value).TotalSeconds > LifeTimeToDrop)
+                {
+                    eplist.Add(a.Key);
+                    Console.WriteLine(a.Key.ToString()+ " time out "+ (DateTime.Now - a.Value).Seconds);
+                }
             }
+            foreach (EndPoint ep in eplist)
+                CourseServers.Remove(ep);
         }
 
         private void AcceptConnection(Object ohandler)
@@ -80,16 +93,18 @@ namespace Dispatcher
             EndPoint REP = handler.RemoteEndPoint;
             Console.WriteLine("(" + DateTime.Now.ToShortTimeString() + ")(" + REP.ToString() + ")" + ": " + builder.ToString());
             string message;
-            if (builder.ToString() == "CourseServer")
+            if (builder.ToString().StartsWith("CourseServer"))
             {
-                addServ(REP);
-                Console.WriteLine(REP.ToString() + " inserted into CourseServerAdded");
-                message = "Your ip added into";
+                IPEndPoint IEP=null;
+                if (getIEP(REP, builder.ToString(), ref IEP))
+                    message = addServ(IEP);
+                else message = "incorrect data";
+                //Console.WriteLine(REP.ToString() + " inserted into CourseServerAdded");
             }
             else if (builder.ToString() == "Client")
             {
                 //CourseServers.Add(handler.RemoteEndPoint, DateTime.Now);
-                Console.WriteLine("NewClient");
+                //Console.WriteLine("NewClient");
                 // отправляем ответ
                 EndPoint ep = getServ();
                 if (ep is null)
@@ -98,7 +113,7 @@ namespace Dispatcher
             }
             else
             {
-                Console.WriteLine("Неизвестное подключение");
+                //Console.WriteLine("Неизвестное подключение");
                 message = "invalid request";
             }
             data = Encoding.Unicode.GetBytes(message);
@@ -132,10 +147,24 @@ namespace Dispatcher
                 Console.WriteLine(ex.Message);
             }
         }
+
+        private bool getIEP(EndPoint ep,string message, ref IPEndPoint IEP)
+        {
+            try
+            {
+                IEP=new IPEndPoint(IPAddress.Parse(ep.ToString().Split(':')[0]), int.Parse(message.Remove(0, 12)));
+                return true; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public void Start()
         {
             ListenThread.Start();
-
+            CleanUpTimer.Start();
         }
     }
 }

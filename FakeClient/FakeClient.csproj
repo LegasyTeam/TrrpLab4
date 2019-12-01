@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B6884F12-6BD4-4C7B-B97A-AF0EBA90BFAD}</ProjectGuid>
+    <ProjectGuid>{7AD3AB7F-C829-4C44-8A0B-BE160B7ED6EE}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>CourseServer</RootNamespace>
-    <AssemblyName>CourseServer</AssemblyName>
+    <RootNamespace>FakeClient</RootNamespace>
+    <AssemblyName>FakeClient</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -44,9 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CourseServer.cs" />
-    <Compile Include="CourseServerProgram.cs" />
-    <Compile Include="ICourseServer.cs" />
+    <Compile Include="Interface1.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
