@@ -1,5 +1,5 @@
 <?php
-	$connection = mysqli_connect('remotemysql.com:3306','11ayOeNb9v','0mI6sAI8oz','11ayOeNb9v');
+	$connection = mysqli_connect('127.0.0.1','root','','finances');
 		if ($connection == false)
 		{
 			echo "Не получилось чот;)))) <br>";
