@@ -13,11 +13,9 @@ namespace Dispatcher
     class Dispatcher
     {
         private  Dictionary<EndPoint, DateTime> CourseServers = new Dictionary<EndPoint, DateTime>();
-        private int port = 7000; // порт для приема входящих запросов
         private IPEndPoint ipPoint;
         private Thread ListenThread;
-        private int LifeTimeToDrop = 10;
-        private int CleanUpPeriodMilliseconds=5000;
+        private int currentservnumber = 0;//индекс сервера из списка серверов, ip которого диспетчер вернет следующему клиенту
         private bool listening=true;//когда будет false, диспатчер перестанет слушать сообщения
         private System.Timers.Timer CleanUpTimer;
         private IPAddress getmyip()//ищем IPv4
@@ -33,19 +31,20 @@ namespace Dispatcher
         }
         public Dispatcher()
         {
-            IPAddress adr = getmyip();
-            ipPoint = new IPEndPoint(adr, port);
+            ipPoint = new IPEndPoint(getmyip(), Properties.Settings.Default.port);
             ListenThread = new Thread(Listen);
             CleanUpTimer = new System.Timers.Timer();
             CleanUpTimer.Elapsed += RemoveNotRespondingServers;
-            CleanUpTimer.Interval = CleanUpPeriodMilliseconds;
+            CleanUpTimer.Interval = Properties.Settings.Default.CleanUpPeriodMilliseconds;
             Console.WriteLine("Dispatcher started: " + ipPoint.ToString());
         }
         public EndPoint getServ()
         {
+            if (currentservnumber == int.MaxValue)
+                currentservnumber = 0;//на случай переполнения
             if (CourseServers.Count > 0)
-                return CourseServers.First().Key;
-            return null;
+                return CourseServers.ElementAt(currentservnumber++ % CourseServers.Count).Key;
+            else return null;
         }
         public string addServ(IPEndPoint ep)
         {
@@ -66,7 +65,7 @@ namespace Dispatcher
             List<EndPoint> eplist = new List<EndPoint>();
             foreach (var a in CourseServers)
             {
-                if ((DateTime.Now-a.Value).TotalSeconds > LifeTimeToDrop)
+                if ((DateTime.Now-a.Value).TotalSeconds > Properties.Settings.Default.LifeTimeToDrop)
                 {
                     eplist.Add(a.Key);
                     Console.WriteLine(a.Key.ToString()+ " time out "+ (DateTime.Now - a.Value).Seconds);

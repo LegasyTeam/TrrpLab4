@@ -19,6 +19,7 @@ namespace FakeClient
             EndpointAddress ep = new EndpointAddress(address);
             ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
             ICourseServer cs = factory.CreateChannel();
+            //Console.WriteLine(cs.GetCurrentCourse(false));
             var userTran = new UserTransaction() { Dollar = true, Count = 10, Token = "c5a7c0d5_144e_11ea_bb7c_08606e6ce1c1" };
             Console.WriteLine(cs.SellValute(JsonConvert.SerializeObject(userTran)));
         }

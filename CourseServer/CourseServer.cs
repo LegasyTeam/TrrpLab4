@@ -21,13 +21,9 @@ namespace CourseServer
     {
         // адрес и порт сервера, к которому будем подключаться
         private int dispatcherport = 7000; // порт диспатчера
-        private string DispatcherAddress = "192.168.1.77";//адрес диспатчера
         private System.Timers.Timer ConnectToDispatcherTimer;//отсчитывает периоды в которые происходит связь с диспетчером
-        private int DispatcherCallInterval = 5000;
         IPAddress myip;
         int myport;
-        private IPEndPoint ipPoint;
-        private Thread ListenThread;
         private string host = "remotemysql.com";
         public DailyInfo di;
 
@@ -36,9 +32,9 @@ namespace CourseServer
             di = new DailyInfo();
             ConnectToDispatcherTimer = new System.Timers.Timer();
             ConnectToDispatcherTimer.Elapsed += ThreadHelloDispatcher;
-            ConnectToDispatcherTimer.Interval = DispatcherCallInterval;
-            myip = getmyip();
-            myport = getmyport();
+            ConnectToDispatcherTimer.Interval = Properties.Settings.Default.DispatcherCallInterval;
+            if (!getmyip() || !getmyport())
+                Console.WriteLine("ip or port getting failed!");
             //ipPoint = new IPEndPoint(getmyip(), getmyport());
         }
         private void ThreadHelloDispatcher(object sender, ElapsedEventArgs e)
@@ -72,7 +68,7 @@ namespace CourseServer
             //Console.WriteLine("Hello Dispatcher started!");
             try
             {
-                IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(DispatcherAddress), dispatcherport);
+                IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(Properties.Settings.Default.DispatcherAddress), Properties.Settings.Default.DispatcherPort);
 
                 Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // подключаемся к удаленному хосту
@@ -262,30 +258,48 @@ namespace CourseServer
         {
             CheckCbrUpd();
             switch (dolar)
-                {
-                    case true:
-                        return GetCurrCurse(0);
-                    case false:
-                        return GetCurrCurse(1);
+            {
+                case true:
+                    return GetCurrCurse(0);
+                case false:
+                    return GetCurrCurse(1);
             }
 
             return 1;
         }
-        private IPAddress getmyip()//ищем IPv4
+        private bool getmyip()//ищем IPv4
         {
             foreach (IPAddress a in Dns.GetHostAddresses(Dns.GetHostName()))
             {
                 if (a.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    return a;
+                    myip = a;
+                    return true;
                 }
             }
-            return null;
+            return false;
         }
-        private int getmyport()
+        private bool getmyport()
         {
-            return 9998;
-            //return int.Parse(SerialPort.GetPortNames().ElementAt(0));
+            int currentPort = Properties.Settings.Default.StartPort;
+            Socket CheckSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            while (currentPort < 10000)
+            {
+                try
+                {
+                    IPEndPoint iep = new IPEndPoint(myip, currentPort);
+                    CheckSocket.Bind(iep);
+                    CheckSocket.Close();
+                    myport = currentPort;
+                    return true;
+                }
+                catch
+                {
+                    currentPort++;
+                }
+
+            }
+            return false;
         }
 
         // JsonConvert.DeserializeObject<DataTable>
