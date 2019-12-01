@@ -13,6 +13,7 @@ using System.Data.SQLite;
 using System.Data;
 
 using Newtonsoft.Json;
+using MySql.Data.MySqlClient;
 
 namespace CourseServer
 {
@@ -25,10 +26,9 @@ namespace CourseServer
         private int DispatcherCallInterval = 5000;
         IPAddress myip;
         int myport;
-        SQLiteConnection db;
         private IPEndPoint ipPoint;
         private Thread ListenThread;
-        
+        private string host = "remotemysql.com";
         public DailyInfo di;
 
         public CourseServer()
@@ -110,15 +110,62 @@ namespace CourseServer
             }
         }
 
+        private static string GetAddress()
+        {
+            return "http://test";
+            //получаем у диспетчера адрес сервера авторизации
+        }
+
+        private SQLiteConnection createDB()
+        {
+            SQLiteConnection.CreateFile("currentCourse.db");
+            var db = new SQLiteConnection("Data Source=currentCourse.db");
+            db.Open();
+
+            SQLiteCommand cmd = new SQLiteCommand(@"CREATE TABLE [Valute](
+                                                    [id] INT PRIMARY KEY, 
+                                                    [name] VARCHAR, 
+                                                    [code] VARCHAR);
+                                                    CREATE TABLE [Curses](
+                                                    [id] INT PRIMARY KEY, 
+                                                    [id_valute] INT, 
+                                                    [date] DATETIME, 
+                                                    [curse] DOUBLE);", db);
+            cmd.ExecuteNonQuery();
+            var data = di.EnumValutes(true).Tables[0];
+            for (int i = 0; i < data.Rows.Count; i++)
+            {
+                var row = data.Rows[i];
+                if (((string)row.ItemArray.GetValue(0)).Equals("R01235") || ((string)row.ItemArray.GetValue(0)).Equals("R01239"))
+                {
+                    cmd.CommandText = "Insert into Valute (name, code) (@name, @code)";
+                    cmd.Parameters.Add(new SQLiteParameter("@name", (string)row.ItemArray.GetValue(1)));
+                    cmd.Parameters.Add(new SQLiteParameter("@code", (string)row.ItemArray.GetValue(0)));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            return db;
+        }
+        
+        private double GetCurrCurse(int cod)
+        {
+            var db = new SQLiteConnection("Data Source=currentCourse.db");
+            db.Open();
+            var  cmd = new SQLiteCommand("Select curse From Curses Where id_valute = '" + cod + 1 + "' AND date = (Select MAx(date) From Curses)", db);
+            var d = cmd.ExecuteScalar();
+            db.Clone();
+            return (double)d;
+        }
+
         private void SetCbrCurrentCurse(DateTime DateFrom, DateTime DateTo, string Code)
         {
             var data = di.GetCursDynamic(DateFrom, DateTo, Code).Tables[0];
-            db = new SQLiteConnection("Data Source=currentCourse.db");
+            var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
             for (int i = 0; i < data.Rows.Count; i++)
             {
                 var row = data.Rows[i];
-                SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select id From Valute Where code = @code), @date, @curse)", db);
+                SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select rowid From Valute Where code = @code), @date, @curse)", db);
                 cmd.Parameters.Add(new SQLiteParameter("@code", Code));
                 cmd.Parameters.Add(new SQLiteParameter("@date", (DateTime)row.ItemArray.GetValue(0)));
                 cmd.Parameters.Add(new SQLiteParameter("@curse", (decimal)row.ItemArray.GetValue(3)));
@@ -127,32 +174,28 @@ namespace CourseServer
             db.Close();
         }
 
-        private double CheckCbrUpd(int cod)
+        private void check(string cod)
         {
-            db = new SQLiteConnection("Data Source=currentCourse.db");
+            var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
-
-            SQLiteCommand cmd = new SQLiteCommand("Select code From Valute Where id = '"+ cod+1+ "'", db);
-            var res = cmd.ExecuteScalar();
-            string valCode = "R01235";
-            if (res != null && res is string)
-            {
-                valCode = (string)res;
-            }
-             cmd = new SQLiteCommand("Select Max(date) as lastDate From Curses", db);
+            
+            var cmd = new SQLiteCommand("Select Max(date) as lastDate From Curses JOin Valute On Curses.id_valute = Valute.rowid WHERE Valute.code = '" + cod + "'", db);
             bool prov = true;
+            bool prov1 = false;
+            DateTime from = new DateTime();
+            DateTime to = new DateTime();
             using (var reader = cmd.ExecuteReader())
             {
                 if (reader.Read())
                 {
-                    var s =  reader["lastDate"];
+                    var s = reader["lastDate"];
                     if (s is string)
                     {
-                        var from = DateTime.Parse((string)reader["lastDate"]).Date;
-                        var to = DateTime.Now.AddDays(-1).Date;
+                        from = DateTime.Parse((string)reader["lastDate"]).Date;
+                        to = DateTime.Now.AddDays(-1).Date;
                         if (from < to)
                         {
-                            SetCbrCurrentCurse(from, to, valCode);
+                            prov1 = true;
                         }
                     }
                     else
@@ -166,32 +209,61 @@ namespace CourseServer
                     prov = false;
                 }
             }
+            db.Close();
             if (!prov)
             {
-                SetCbrCurrentCurse(new DateTime(2019, 1,1).Date, DateTime.Now.Date, valCode);
+                SetCbrCurrentCurse(new DateTime(2019, 1, 1).Date, DateTime.Now.Date, cod);
             }
+            else
+            {
+                if (prov1)
+                {
+                    SetCbrCurrentCurse(from, to, cod);
+                }
+            }
+        }
 
-            cmd = new SQLiteCommand("Select curse From Curses Where id_valute = '" + cod + 1 + "' AND date = (Select MAx(date) From Curses)", db);
-            var d = cmd.ExecuteScalar();
-
-
+        private void CheckCbrUpd()
+        {
+            SQLiteConnection db;
+            try
+            {
+                db = new SQLiteConnection("Data Source=currentCourse.db");
+            }
+            catch {
+                db = createDB();
+            }
+           
+            db.Open();
+            SQLiteCommand cmd = new SQLiteCommand("Select code From Valute", db);
+            var list = new List<string>(); 
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    list.Add((string)(reader.GetValue(0)));
+                    
+                }
+            }
             db.Close();
-            return (double)d;
+            foreach (var element in list)
+            {
+                check(element);
+            }
         }
 
 
 
-        public int GetCurrentCourse(int dolar)//допилить
+        public double GetCurrentCourse(bool dolar)//допилить
         {
-            return Convert.ToInt32(CheckCbrUpd(0));
+            CheckCbrUpd();
             switch (dolar)
                 {
-                    case 0:
-                        break;
-                    case 1:
-                        break;
-
-                }
+                    case true:
+                        return GetCurrCurse(0);
+                    case false:
+                        return GetCurrCurse(1);
+            }
 
             return 1;
         }
@@ -212,11 +284,12 @@ namespace CourseServer
             //return int.Parse(SerialPort.GetPortNames().ElementAt(0));
         }
 
+        // JsonConvert.DeserializeObject<DataTable>
         public string GetCurrenttCourse(DateTime from, DateTime to)
         {
             var dt = new DataTable();
-            CheckCbrUpd(0);
-            db = new SQLiteConnection("Data Source=currentCourse.db");
+            CheckCbrUpd();
+            var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
             SQLiteCommand cmd = new SQLiteCommand("Select Valute.name as name, Curses.date as date, Curses.curse as curse from Curses Join Valute On Valute.id = Curses.id_valute  Where date >= @dateFrom AND date <= @dateTo", db);
             cmd.Parameters.Add(new SQLiteParameter("@dateFrom", from));
@@ -235,6 +308,123 @@ namespace CourseServer
             db.Close();
 
             return JsonConvert.SerializeObject(dt);
+        }
+
+
+        // JsonConvert.DeserializeObject<List<int>>
+        public string GetBalance(string token)
+        {
+            List<int> balance = new List<int>();
+            MySqlConnection conn = new MySqlConnection("Server=" + host + ";Database=11ayOeNb9v;port=3306;User Id=11ayOeNb9v;password=0mI6sAI8oz");
+            conn.Open();
+            var cmd = new MySqlCommand("Select `rub`,`eur`, `usd` From `Users` Where token = '" + token + "'", conn);
+           
+            using (var reader = cmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    balance.Add((int)reader["rub"]);
+                    balance.Add((int)reader["eur"]);
+                    balance.Add((int)reader["usd"]);
+                }
+            }
+            conn.Close();
+            return JsonConvert.SerializeObject(balance);
+        }
+
+
+        public string BuyValute(string mass)
+        {
+            //object ??
+            CheckCbrUpd();
+            string result = "";
+            var obj = JsonConvert.DeserializeObject<UserTransaction>(mass);
+
+            double curse = 0;
+            string usdOrEur = "eur";
+            int userRub = 0, userValute = 0;
+            
+           
+            var list = JsonConvert.DeserializeObject<List<int>>(GetBalance(obj.Token));
+            userRub = list[0];
+            switch (obj.Dollar)
+            {
+                case true:
+                    curse = GetCurrCurse(0);
+                    usdOrEur = "usd";
+                    userValute = list[2];
+                    break;
+                case false:
+                    curse = GetCurrCurse(1);
+                    userValute = list[1];
+                    usdOrEur = "eur";
+                    break;
+            }
+            var countValute = Convert.ToInt32(Math.Round(curse)) * obj.Count;
+            if (userRub >= countValute)
+            {
+                userValute += obj.Count;
+                userRub -= countValute;
+                MySqlConnection conn = new MySqlConnection("Server=" + host + ";Database=11ayOeNb9v;port=3306;User Id=11ayOeNb9v;password=0mI6sAI8oz");
+                conn.Open();
+                var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute, conn);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+                result = "Транзакция прошла успешно";
+            }
+            else
+            {
+                result = "Транзакция не прошла";
+            }
+            //serialize object
+            return result;
+            
+        }
+
+        public string SellValute(string mass)
+        {
+            //object ??
+            CheckCbrUpd();
+            string result = "";
+            var obj = JsonConvert.DeserializeObject<UserTransaction>(mass);
+            
+            double curse = 0;
+            string usdOrEur = "eur";
+            int userRub = 0, userValute = 0;
+            var list = JsonConvert.DeserializeObject<List<int>>(GetBalance(obj.Token));
+            userRub = list[0];
+            switch (obj.Dollar)
+            {
+                case true:
+                    curse = GetCurrCurse(0);
+                    usdOrEur = "usd";
+                    userValute = list[2];
+                    break;
+                case false:
+                    curse = GetCurrCurse(1);
+                    userValute = list[1];
+                    usdOrEur = "eur";
+                    break;
+            }
+            
+            if (userValute >= obj.Count)
+            {
+                userValute -= obj.Count;
+                userRub += Convert.ToInt32(Math.Round(curse)) * obj.Count;
+                MySqlConnection conn = new MySqlConnection("Server=" + host + ";Database=11ayOeNb9v;port=3306;User Id=11ayOeNb9v;password=0mI6sAI8oz");
+                conn.Open();
+                var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute, conn);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+                result = "Транзакция прошла успешно";
+            }
+            else
+            {
+                result = "Транзакция не прошла";
+            }
+            
+            //serialize object
+            return result;
         }
     }
 }
