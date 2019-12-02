@@ -200,7 +200,7 @@ namespace CourseServer
                     var s = reader["lastDate"];
                     if (s is string)
                     {
-                        from = DateTime.Parse((string)reader["lastDate"]).Date;
+                        from = DateTime.Parse((string)reader["lastDate"]).AddDays(1).Date;
                         to = DateTime.Now.AddDays(-1).Date;
                         if (from < to)
                         {
@@ -321,11 +321,12 @@ namespace CourseServer
             CheckCbrUpd();
             var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
-            SQLiteCommand cmd = new SQLiteCommand("Select Curses.id_valute as name, Curses.date as date, Curses.curse as curse from Curses  Where date >= '@dateFrom' AND date <= '@dateTo'", db);
             var st = from.ToString("yyyy-MM-dd HH:mm:ss");
             var st2 = to.ToString("yyyy-MM-dd HH:mm:ss");
-            cmd.Parameters.Add(new SQLiteParameter("@dateFrom", from.ToString("yyyy-MM-dd HH:mm:ss")));
-            cmd.Parameters.Add(new SQLiteParameter("@dateTo", to.ToString("yyyy-MM-dd HH:mm:ss")));
+            SQLiteCommand cmd = new SQLiteCommand("Select Curses.id_valute as name, Curses.date as date, Curses.curse as curse from Curses  Where date >= '"+st+"' AND date <= '"+st2+"'", db);
+            
+            //cmd.Parameters.Add(new SQLiteParameter("@dateFrom", from.ToString("yyyy-MM-dd HH:mm:ss")));
+            //cmd.Parameters.Add(new SQLiteParameter("@dateTo", to.ToString("yyyy-MM-dd HH:mm:ss")));
             dt.Columns.Add("Название");
             dt.Columns.Add("Дата");
             dt.Columns.Add("Курс");
