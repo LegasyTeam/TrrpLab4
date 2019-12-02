@@ -328,12 +328,11 @@ namespace CourseServer
             return JsonConvert.SerializeObject(dt);
         }
 
-
         // JsonConvert.DeserializeObject<List<int>>
         public string GetBalance(string token)
         {
             List<int> balance = new List<int>();
-            MySqlConnection conn = new MySqlConnection("Server=" + host + ";Database=11ayOeNb9v;port=3306;User Id=11ayOeNb9v;password=0mI6sAI8oz");
+            MySqlConnection conn = new MySqlConnection(@"server=remotemysql.com:3306;database=11ayOeNb9v;uid=11ayOeNb9v;pwd=0mI6sAI8oz");
             conn.Open();
             var cmd = new MySqlCommand("Select `rub`,`eur`, `usd` From `Users` Where token = '" + token + "'", conn);
            

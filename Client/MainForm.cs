@@ -216,7 +216,7 @@ namespace WindowsFormsApp1
                 EndpointAddress ep = new EndpointAddress(address);
                 ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
                 ICourseServer cs = factory.CreateChannel();
-                var userTran = new UserTransaction() { Dollar = true, Count = 10, Token = "c5a7c0d5_144e_11ea_bb7c_08606e6ce1c1" };
+                var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
                 MessageBox.Show(cs.SellValute(JsonConvert.SerializeObject(userTran)));
             }
             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
