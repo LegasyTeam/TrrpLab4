@@ -24,7 +24,14 @@ namespace CourseServer
         private System.Timers.Timer ConnectToDispatcherTimer;//отсчитывает периоды в которые происходит связь с диспетчером
         IPAddress myip;
         int myport;
-        private string host = "remotemysql.com";
+        static MySqlConnectionStringBuilder conn_string = new MySqlConnectionStringBuilder()
+        {
+            Server = "37.59.55.185",
+            Port = 3306,
+            UserID = "11ayOeNb9v",
+            Password = "0mI6sAI8oz",
+            Database = "11ayOeNb9v"
+        };
         public DailyInfo di;
 
         public CourseServer()
@@ -328,11 +335,12 @@ namespace CourseServer
             return JsonConvert.SerializeObject(dt);
         }
 
+
         // JsonConvert.DeserializeObject<List<int>>
         public string GetBalance(string token)
         {
             List<int> balance = new List<int>();
-            MySqlConnection conn = new MySqlConnection(@"server=remotemysql.com:3306;database=11ayOeNb9v;uid=11ayOeNb9v;pwd=0mI6sAI8oz");
+            MySqlConnection conn = new MySqlConnection(conn_string.ConnectionString);
             conn.Open();
             var cmd = new MySqlCommand("Select `rub`,`eur`, `usd` From `Users` Where token = '" + token + "'", conn);
            
@@ -382,7 +390,7 @@ namespace CourseServer
             {
                 userValute += obj.Count;
                 userRub -= countValute;
-                MySqlConnection conn = new MySqlConnection("Server=" + host + ";Database=11ayOeNb9v;port=3306;User Id=11ayOeNb9v;password=0mI6sAI8oz");
+                MySqlConnection conn = new MySqlConnection(conn_string.ConnectionString);
                 conn.Open();
                 var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute, conn);
                 cmd.ExecuteNonQuery();
@@ -428,7 +436,7 @@ namespace CourseServer
             {
                 userValute -= obj.Count;
                 userRub += Convert.ToInt32(Math.Round(curse)) * obj.Count;
-                MySqlConnection conn = new MySqlConnection("Server=" + host + ";Database=11ayOeNb9v;port=3306;User Id=11ayOeNb9v;password=0mI6sAI8oz");
+                MySqlConnection conn = new MySqlConnection(conn_string.ConnectionString);
                 conn.Open();
                 var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute, conn);
                 cmd.ExecuteNonQuery();
