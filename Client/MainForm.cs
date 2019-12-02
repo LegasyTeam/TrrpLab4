@@ -89,15 +89,25 @@ namespace WindowsFormsApp1
             InitializeAddress();
             InitializeCourses();
             InitializeWallet();
+            GetGraphic(rBWeek);
             cbBuy.SelectedIndex = 0;
             cbSell.SelectedIndex = 0;
             //MessageBox.Show(Address);
         }
 
+
+
         private void InitializeCourses()
         {
-            UsdRub = 3550;
-            EurRub = 4325;
+            Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+            BasicHttpBinding binding = new BasicHttpBinding();
+            EndpointAddress ep = new EndpointAddress(address);
+            ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+            ICourseServer cs = factory.CreateChannel();
+            var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
+
+            UsdRub = Convert.ToInt32(cs.GetCurrentCourse(true) * 100);
+            EurRub = Convert.ToInt32(cs.GetCurrentCourse(false) * 100);
         }
         private void InitializeAddress()
         {
@@ -131,9 +141,16 @@ namespace WindowsFormsApp1
         private void InitializeWallet()
         {
             //имитация получения с сервера
-            int RubValue = 2000000;
-            int UsdValue = 0;
-            int EurValue = 0;
+            Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+            BasicHttpBinding binding = new BasicHttpBinding();
+            EndpointAddress ep = new EndpointAddress(address);
+            ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+            ICourseServer cs = factory.CreateChannel();
+            var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
+            var list = JsonConvert.DeserializeObject<List<int>> (cs.GetBalance(token));
+            int RubValue = list[0];
+            int UsdValue = list[2];
+            int EurValue = list[1];
             //получение с сервера
             RubWallet = RubValue;
             UsdWallet = UsdValue;
@@ -216,19 +233,104 @@ namespace WindowsFormsApp1
                 EndpointAddress ep = new EndpointAddress(address);
                 ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
                 ICourseServer cs = factory.CreateChannel();
-                var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
-                MessageBox.Show(cs.SellValute(JsonConvert.SerializeObject(userTran)));
+                bool provValute = true;
+                if (cbBuy.SelectedItem == "EUR")
+                    provValute = false;
+                var userTran = new UserTransaction() { Dollar = provValute, Count = (int.Parse(tbBuyValue.Text) * 100), Token = token };
+                string message = cs.BuyValute(JsonConvert.SerializeObject(userTran));
+                if (message.Equals("Транзакция прошла успешно"))
+                {
+                    if (provValute)
+                    {
+                        RubWallet -= UsdRub * userTran.Count/100;
+                        UsdWallet += userTran.Count;
+                    }
+                    else
+                    {
+                        RubWallet -= EurRub * userTran.Count/100;
+                        EurWallet += userTran.Count ;
+                    }
+                }
+                MessageBox.Show(message);
+
             }
-            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         private void btnSell_Click(object sender, EventArgs e)
         {
+            try
+            {
+                Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+                BasicHttpBinding binding = new BasicHttpBinding();
+                EndpointAddress ep = new EndpointAddress(address);
+                ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+                ICourseServer cs = factory.CreateChannel();
+                bool provValute = true;
+                if (cbSell.SelectedItem == "EUR")
+                    provValute = false;
+                var userTran = new UserTransaction() { Dollar = provValute, Count = (int.Parse(tbSellValue.Text) * 100), Token = token };
+                string message = cs.SellValute(JsonConvert.SerializeObject(userTran));
+                if (message.Equals("Транзакция прошла успешно"))
+                {
+                    if (provValute)
+                    {
+                        RubWallet += UsdRub * userTran.Count/100;
+                        UsdWallet -= userTran.Count;
+                    }
+                    else
+                    {
+                        RubWallet += EurRub * userTran.Count/100;
+                        EurWallet -= userTran.Count;
+                    }
+                }
+                MessageBox.Show(message);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
         }
 
         private void cbBuy_SelectedIndexChanged(object sender, EventArgs e)
         {
             tbBuyValue_TextChanged(sender, e);
+        }
+
+        private void GetGraphic(RadioButton rb)
+        {
+            DateTime From = new DateTime(), To = new DateTime();
+            switch (rb.Name)
+            {
+                case "rBWeek":
+                    From = DateTime.Now.AddDays(-8);
+                    To = DateTime.Now.AddDays(-1);
+
+                    break;
+                case "rBMonth":
+
+                    From = DateTime.Now.AddDays(-32);
+                    To = DateTime.Now.AddDays(-1);
+                    break;
+                case "rBYear":
+                    From = DateTime.Now.AddDays(-365);
+                    if (From < new DateTime(2019, 1, 1))
+                    {
+                        From = new DateTime(2019, 1, 1);
+                    }
+                    To = DateTime.Now.AddDays(-1);
+                    break;
+            }
+            Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+            BasicHttpBinding binding = new BasicHttpBinding();
+            EndpointAddress ep = new EndpointAddress(address);
+            ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+            ICourseServer cs = factory.CreateChannel();
+            var res = JsonConvert.DeserializeObject<DataTable>(cs.GetCurrenttCourse(From, To));
+        }
+
+        private void rBWeek_CheckedChanged(object sender, EventArgs e)
+        {
+            var rb = (RadioButton)sender;
+            GetGraphic(rb);
+
         }
     }
 }

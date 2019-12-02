@@ -157,7 +157,7 @@ namespace CourseServer
         {
             var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
-            var  cmd = new SQLiteCommand("Select curse From Curses Where id_valute = '" + cod + 1 + "' AND date = (Select MAx(date) From Curses)", db);
+            var  cmd = new SQLiteCommand("Select curse From Curses Where id_valute = '" + (cod + 1) + "' AND date = (Select MAx(date) From Curses)", db);
             var d = cmd.ExecuteScalar();
             db.Clone();
             return (double)d;
@@ -321,9 +321,11 @@ namespace CourseServer
             CheckCbrUpd();
             var db = new SQLiteConnection("Data Source=currentCourse.db");
             db.Open();
-            SQLiteCommand cmd = new SQLiteCommand("Select Valute.name as name, Curses.date as date, Curses.curse as curse from Curses Join Valute On Valute.id = Curses.id_valute  Where date >= @dateFrom AND date <= @dateTo", db);
-            cmd.Parameters.Add(new SQLiteParameter("@dateFrom", from));
-            cmd.Parameters.Add(new SQLiteParameter("@dateTo", to));
+            SQLiteCommand cmd = new SQLiteCommand("Select Curses.id_valute as name, Curses.date as date, Curses.curse as curse from Curses  Where date >= '@dateFrom' AND date <= '@dateTo'", db);
+            var st = from.ToString("yyyy-MM-dd HH:mm:ss");
+            var st2 = to.ToString("yyyy-MM-dd HH:mm:ss");
+            cmd.Parameters.Add(new SQLiteParameter("@dateFrom", from.ToString("yyyy-MM-dd HH:mm:ss")));
+            cmd.Parameters.Add(new SQLiteParameter("@dateTo", to.ToString("yyyy-MM-dd HH:mm:ss")));
             dt.Columns.Add("Название");
             dt.Columns.Add("Дата");
             dt.Columns.Add("Курс");
@@ -390,14 +392,14 @@ namespace CourseServer
                     usdOrEur = "eur";
                     break;
             }
-            var countValute = Convert.ToInt32(Math.Round(curse)) * obj.Count;
+            var countValute = Convert.ToInt32(Math.Round(curse * 100)) * obj.Count/100;
             if (userRub >= countValute)
             {
                 userValute += obj.Count;
                 userRub -= countValute;
                 MySqlConnection conn = new MySqlConnection(conn_string.ConnectionString);
                 conn.Open();
-                var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute, conn);
+                var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute + " WHERE `token` = '" + obj.Token + "'", conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
                 result = "Транзакция прошла успешно";
@@ -440,10 +442,10 @@ namespace CourseServer
             if (userValute >= obj.Count)
             {
                 userValute -= obj.Count;
-                userRub += Convert.ToInt32(Math.Round(curse)) * obj.Count;
+                userRub += Convert.ToInt32(Math.Round(curse* 100)) * obj.Count/100;
                 MySqlConnection conn = new MySqlConnection(conn_string.ConnectionString);
                 conn.Open();
-                var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute, conn);
+                var cmd = new MySqlCommand("Update `Users` Set `rub` = " + userRub + ", `" + usdOrEur + "` = " + userValute + " WHERE `token` = '" + obj.Token + "'", conn);
                 cmd.ExecuteNonQuery();
                 conn.Close();
                 result = "Транзакция прошла успешно";

@@ -28,6 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.labelValHdr = new System.Windows.Forms.Label();
             this.btnSell = new System.Windows.Forms.Button();
             this.labelUsdHdr = new System.Windows.Forms.Label();
@@ -45,6 +49,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.gbWallet = new System.Windows.Forms.GroupBox();
             this.gbExch = new System.Windows.Forms.GroupBox();
+            this.btnBuy = new System.Windows.Forms.Button();
             this.labelExchHdr4 = new System.Windows.Forms.Label();
             this.labelExchHdr2 = new System.Windows.Forms.Label();
             this.labelExchHdr3 = new System.Windows.Forms.Label();
@@ -53,10 +58,16 @@
             this.cbSell = new System.Windows.Forms.ComboBox();
             this.tbBuyValue = new System.Windows.Forms.TextBox();
             this.cbBuy = new System.Windows.Forms.ComboBox();
-            this.btnBuy = new System.Windows.Forms.Button();
+            this.chartChanges = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rBWeek = new System.Windows.Forms.RadioButton();
+            this.rBYear = new System.Windows.Forms.RadioButton();
+            this.rBMonth = new System.Windows.Forms.RadioButton();
             this.gbCourse.SuspendLayout();
             this.gbWallet.SuspendLayout();
             this.gbExch.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartChanges)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelValHdr
@@ -126,7 +137,7 @@
             // 
             this.labelWalHdr.AutoSize = true;
             this.labelWalHdr.Font = new System.Drawing.Font("Century Gothic", 26.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelWalHdr.Location = new System.Drawing.Point(502, 23);
+            this.labelWalHdr.Location = new System.Drawing.Point(92, 23);
             this.labelWalHdr.Name = "labelWalHdr";
             this.labelWalHdr.Size = new System.Drawing.Size(258, 41);
             this.labelWalHdr.TabIndex = 6;
@@ -147,7 +158,7 @@
             // 
             this.labelWalRubHdr.AutoSize = true;
             this.labelWalRubHdr.Font = new System.Drawing.Font("Arial Narrow", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelWalRubHdr.Location = new System.Drawing.Point(509, 93);
+            this.labelWalRubHdr.Location = new System.Drawing.Point(94, 93);
             this.labelWalRubHdr.Name = "labelWalRubHdr";
             this.labelWalRubHdr.Size = new System.Drawing.Size(55, 29);
             this.labelWalRubHdr.TabIndex = 7;
@@ -157,7 +168,7 @@
             // 
             this.labelWalUsdValue.AutoSize = true;
             this.labelWalUsdValue.Font = new System.Drawing.Font("Arial Narrow", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelWalUsdValue.Location = new System.Drawing.Point(647, 134);
+            this.labelWalUsdValue.Location = new System.Drawing.Point(232, 134);
             this.labelWalUsdValue.Name = "labelWalUsdValue";
             this.labelWalUsdValue.Size = new System.Drawing.Size(113, 29);
             this.labelWalUsdValue.TabIndex = 10;
@@ -168,7 +179,7 @@
             // 
             this.labelWalUsdHdr.AutoSize = true;
             this.labelWalUsdHdr.Font = new System.Drawing.Font("Arial Narrow", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelWalUsdHdr.Location = new System.Drawing.Point(509, 134);
+            this.labelWalUsdHdr.Location = new System.Drawing.Point(94, 134);
             this.labelWalUsdHdr.Name = "labelWalUsdHdr";
             this.labelWalUsdHdr.Size = new System.Drawing.Size(54, 29);
             this.labelWalUsdHdr.TabIndex = 9;
@@ -178,7 +189,7 @@
             // 
             this.labelWalEurValue.AutoSize = true;
             this.labelWalEurValue.Font = new System.Drawing.Font("Arial Narrow", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelWalEurValue.Location = new System.Drawing.Point(647, 175);
+            this.labelWalEurValue.Location = new System.Drawing.Point(232, 175);
             this.labelWalEurValue.Name = "labelWalEurValue";
             this.labelWalEurValue.Size = new System.Drawing.Size(113, 29);
             this.labelWalEurValue.TabIndex = 12;
@@ -189,7 +200,7 @@
             // 
             this.labelWalEurHdr.AutoSize = true;
             this.labelWalEurHdr.Font = new System.Drawing.Font("Arial Narrow", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelWalEurHdr.Location = new System.Drawing.Point(509, 175);
+            this.labelWalEurHdr.Location = new System.Drawing.Point(94, 175);
             this.labelWalEurHdr.Name = "labelWalEurHdr";
             this.labelWalEurHdr.Size = new System.Drawing.Size(54, 29);
             this.labelWalEurHdr.TabIndex = 11;
@@ -197,6 +208,8 @@
             // 
             // gbCourse
             // 
+            this.gbCourse.Controls.Add(this.groupBox1);
+            this.gbCourse.Controls.Add(this.chartChanges);
             this.gbCourse.Controls.Add(this.label1);
             this.gbCourse.Controls.Add(this.labelValHdr);
             this.gbCourse.Controls.Add(this.labelUsdHdr);
@@ -206,7 +219,7 @@
             this.gbCourse.Dock = System.Windows.Forms.DockStyle.Left;
             this.gbCourse.Location = new System.Drawing.Point(0, 0);
             this.gbCourse.Name = "gbCourse";
-            this.gbCourse.Size = new System.Drawing.Size(415, 461);
+            this.gbCourse.Size = new System.Drawing.Size(509, 461);
             this.gbCourse.TabIndex = 13;
             this.gbCourse.TabStop = false;
             // 
@@ -222,10 +235,16 @@
             // 
             // gbWallet
             // 
+            this.gbWallet.Controls.Add(this.labelWalEurValue);
             this.gbWallet.Controls.Add(this.gbExch);
+            this.gbWallet.Controls.Add(this.labelWalEurHdr);
             this.gbWallet.Controls.Add(this.labelWalRubValue);
+            this.gbWallet.Controls.Add(this.labelWalUsdValue);
+            this.gbWallet.Controls.Add(this.labelWalUsdHdr);
+            this.gbWallet.Controls.Add(this.labelWalHdr);
+            this.gbWallet.Controls.Add(this.labelWalRubHdr);
             this.gbWallet.Dock = System.Windows.Forms.DockStyle.Right;
-            this.gbWallet.Location = new System.Drawing.Point(415, 0);
+            this.gbWallet.Location = new System.Drawing.Point(515, 0);
             this.gbWallet.Name = "gbWallet";
             this.gbWallet.Size = new System.Drawing.Size(419, 461);
             this.gbWallet.TabIndex = 14;
@@ -250,6 +269,17 @@
             this.gbExch.TabIndex = 0;
             this.gbExch.TabStop = false;
             this.gbExch.Text = "Обмен валют";
+            // 
+            // btnBuy
+            // 
+            this.btnBuy.Enabled = false;
+            this.btnBuy.Location = new System.Drawing.Point(329, 46);
+            this.btnBuy.Name = "btnBuy";
+            this.btnBuy.Size = new System.Drawing.Size(75, 23);
+            this.btnBuy.TabIndex = 10;
+            this.btnBuy.Text = "Купить";
+            this.btnBuy.UseVisualStyleBackColor = true;
+            this.btnBuy.Click += new System.EventHandler(this.btnBuy_Click);
             // 
             // labelExchHdr4
             // 
@@ -333,32 +363,84 @@
             this.cbBuy.TabIndex = 2;
             this.cbBuy.SelectedIndexChanged += new System.EventHandler(this.cbBuy_SelectedIndexChanged);
             // 
-            // btnBuy
+            // chartChanges
             // 
-            this.btnBuy.Enabled = false;
-            this.btnBuy.Location = new System.Drawing.Point(329, 46);
-            this.btnBuy.Name = "btnBuy";
-            this.btnBuy.Size = new System.Drawing.Size(75, 23);
-            this.btnBuy.TabIndex = 10;
-            this.btnBuy.Text = "Купить";
-            this.btnBuy.UseVisualStyleBackColor = true;
-            this.btnBuy.Click += new System.EventHandler(this.btnBuy_Click);
+            chartArea3.Name = "ChartArea1";
+            this.chartChanges.ChartAreas.Add(chartArea3);
+            legend3.Name = "Legend1";
+            this.chartChanges.Legends.Add(legend3);
+            this.chartChanges.Location = new System.Drawing.Point(37, 245);
+            this.chartChanges.Name = "chartChanges";
+            this.chartChanges.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Fire;
+            series5.ChartArea = "ChartArea1";
+            series5.Legend = "Legend1";
+            series5.Name = "USD";
+            series6.ChartArea = "ChartArea1";
+            series6.Legend = "Legend1";
+            series6.Name = "EUR";
+            this.chartChanges.Series.Add(series5);
+            this.chartChanges.Series.Add(series6);
+            this.chartChanges.Size = new System.Drawing.Size(328, 204);
+            this.chartChanges.TabIndex = 7;
+            this.chartChanges.Text = "chart1";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rBMonth);
+            this.groupBox1.Controls.Add(this.rBYear);
+            this.groupBox1.Controls.Add(this.rBWeek);
+            this.groupBox1.Location = new System.Drawing.Point(371, 245);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(132, 99);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            // 
+            // rBWeek
+            // 
+            this.rBWeek.AutoSize = true;
+            this.rBWeek.Checked = true;
+            this.rBWeek.Location = new System.Drawing.Point(6, 19);
+            this.rBWeek.Name = "rBWeek";
+            this.rBWeek.Size = new System.Drawing.Size(79, 17);
+            this.rBWeek.TabIndex = 0;
+            this.rBWeek.TabStop = true;
+            this.rBWeek.Text = "За неделю";
+            this.rBWeek.UseVisualStyleBackColor = true;
+            this.rBWeek.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // rBYear
+            // 
+            this.rBYear.AutoSize = true;
+            this.rBYear.Location = new System.Drawing.Point(6, 65);
+            this.rBYear.Name = "rBYear";
+            this.rBYear.Size = new System.Drawing.Size(58, 17);
+            this.rBYear.TabIndex = 1;
+            this.rBYear.TabStop = true;
+            this.rBYear.Text = "За год";
+            this.rBYear.UseVisualStyleBackColor = true;
+            this.rBYear.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // rBMonth
+            // 
+            this.rBMonth.AutoSize = true;
+            this.rBMonth.Location = new System.Drawing.Point(6, 42);
+            this.rBMonth.Name = "rBMonth";
+            this.rBMonth.Size = new System.Drawing.Size(73, 17);
+            this.rBMonth.TabIndex = 2;
+            this.rBMonth.TabStop = true;
+            this.rBMonth.Text = "За месяц";
+            this.rBMonth.UseVisualStyleBackColor = true;
+            this.rBMonth.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(834, 461);
-            this.Controls.Add(this.labelWalEurValue);
-            this.Controls.Add(this.labelWalEurHdr);
-            this.Controls.Add(this.labelWalUsdValue);
-            this.Controls.Add(this.labelWalUsdHdr);
-            this.Controls.Add(this.labelWalRubHdr);
-            this.Controls.Add(this.labelWalHdr);
+            this.ClientSize = new System.Drawing.Size(934, 461);
             this.Controls.Add(this.gbCourse);
             this.Controls.Add(this.gbWallet);
-            this.MaximumSize = new System.Drawing.Size(850, 500);
-            this.MinimumSize = new System.Drawing.Size(850, 500);
+            this.MaximumSize = new System.Drawing.Size(950, 500);
+            this.MinimumSize = new System.Drawing.Size(950, 500);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MainForm";
@@ -369,8 +451,10 @@
             this.gbWallet.PerformLayout();
             this.gbExch.ResumeLayout(false);
             this.gbExch.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartChanges)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -402,5 +486,10 @@
         private System.Windows.Forms.Label labelExchHdr2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnBuy;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartChanges;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton rBMonth;
+        private System.Windows.Forms.RadioButton rBYear;
+        private System.Windows.Forms.RadioButton rBWeek;
     }
 }
