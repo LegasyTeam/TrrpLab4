@@ -324,6 +324,23 @@ namespace WindowsFormsApp1
             ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
             ICourseServer cs = factory.CreateChannel();
             var res = JsonConvert.DeserializeObject<DataTable>(cs.GetCurrenttCourse(From, To));
+
+            for (int i = 0; i < res.Rows.Count; i++)
+            {
+                var row = res.Rows[i];
+                if (row.ItemArray.GetValue(0).Equals("1"))
+                {
+                    var date  = DateTime.Parse((string)row.ItemArray.GetValue(1)).ToString("MM-dd");
+                    var curse = Math.Round(double.Parse((string)row.ItemArray.GetValue(2)),2);
+                    chartChanges.Series["USD"].Points.AddXY(date, curse);
+                }
+                else
+                {
+                    var date = DateTime.Parse((string)row.ItemArray.GetValue(1)).ToString("MM-dd");
+                    var curse = Math.Round(double.Parse((string)row.ItemArray.GetValue(2)), 2);
+                    chartChanges.Series["EUR"].Points.AddXY(date, curse);
+                }
+            }
         }
 
         private void rBWeek_CheckedChanged(object sender, EventArgs e)
