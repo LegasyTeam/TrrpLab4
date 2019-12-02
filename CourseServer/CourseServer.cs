@@ -56,6 +56,8 @@ namespace CourseServer
             Uri address = new Uri(s);
             BasicHttpBinding binding = new BasicHttpBinding();
             Type contract = typeof(ICourseServer);
+            Properties.Settings.Default.DispatcherAddress = "26.29.23.251";
+            Properties.Settings.Default.DispatcherPort = 7000;
             ServiceHost host = new ServiceHost(typeof(CourseServer));
             host.AddServiceEndpoint(contract, binding, address);
             host.Open();
@@ -156,19 +158,24 @@ namespace CourseServer
 
         private void SetCbrCurrentCurse(DateTime DateFrom, DateTime DateTo, string Code)
         {
-            var data = di.GetCursDynamic(DateFrom, DateTo, Code).Tables[0];
-            var db = new SQLiteConnection("Data Source=currentCourse.db");
-            db.Open();
-            for (int i = 0; i < data.Rows.Count; i++)
+            if (DateTo.DayOfWeek != DayOfWeek.Saturday && DateTo.DayOfWeek != DayOfWeek.Sunday)
             {
-                var row = data.Rows[i];
-                SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select rowid From Valute Where code = @code), @date, @curse)", db);
-                cmd.Parameters.Add(new SQLiteParameter("@code", Code));
-                cmd.Parameters.Add(new SQLiteParameter("@date", (DateTime)row.ItemArray.GetValue(0)));
-                cmd.Parameters.Add(new SQLiteParameter("@curse", (decimal)row.ItemArray.GetValue(3)));
-                cmd.ExecuteNonQuery();
+                var data = di.GetCursDynamic(DateFrom, DateTo, Code).Tables[0];
+                var db = new SQLiteConnection("Data Source=currentCourse.db");
+                db.Open();
+                for (int i = 0; i < data.Rows.Count; i++)
+                {
+                    var row = data.Rows[i];
+                    SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select rowid From Valute Where code = @code), @date, @curse)", db);
+                    cmd.Parameters.Add(new SQLiteParameter("@code", Code));
+                    cmd.Parameters.Add(new SQLiteParameter("@date", (DateTime)row.ItemArray.GetValue(0)));
+                    cmd.Parameters.Add(new SQLiteParameter("@curse", (decimal)row.ItemArray.GetValue(3)));
+                    cmd.ExecuteNonQuery();
+                }
+                db.Close();
             }
-            db.Close();
+
+               
         }
 
         private void check(string cod)
@@ -222,15 +229,15 @@ namespace CourseServer
 
         private void CheckCbrUpd()
         {
-            SQLiteConnection db;
+            SQLiteConnection db = new SQLiteConnection("Data Source=currentCourse.db");
             try
             {
-                db = new SQLiteConnection("Data Source=currentCourse.db");
                 db.Open();
                 SQLiteCommand cmd1 = new SQLiteCommand("Select code From Valute", db);
                 cmd1.ExecuteNonQuery();
             }
             catch {
+                db.Close();
                 db = createDB();
             }
            

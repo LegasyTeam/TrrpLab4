@@ -16,6 +16,8 @@ namespace WindowsFormsApp1
         public AuthForm()
         {
             InitializeComponent();
+            var form = new MainForm("c5a7c0d5_144e_11ea_bb7c_08606e6ce1c1", "vadya228");
+            form.Show();
         }
 
         private void loginTb_TextChanged(object sender, EventArgs e)

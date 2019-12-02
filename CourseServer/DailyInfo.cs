@@ -67,7 +67,7 @@ namespace CourseServer
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("http://web.cbr.ru/GetCursDynamic", RequestNamespace = "http://web.cbr.ru/", ResponseNamespace = "http://web.cbr.ru/", Use = System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle = System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public System.Data.DataSet GetCursDynamic(System.DateTime FromDate, System.DateTime ToDate, string ValutaCode)
         {
-            object[] results = this.Invoke("GetCursDynamic", new object[] {
+                        object[] results = this.Invoke("GetCursDynamic", new object[] {
                         FromDate,
                         ToDate,
                         ValutaCode});
