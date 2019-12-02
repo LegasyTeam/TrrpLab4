@@ -165,8 +165,7 @@ namespace CourseServer
 
         private void SetCbrCurrentCurse(DateTime DateFrom, DateTime DateTo, string Code)
         {
-            if (DateTo.DayOfWeek != DayOfWeek.Saturday && DateTo.DayOfWeek != DayOfWeek.Sunday)
-            {
+            try {
                 var data = di.GetCursDynamic(DateFrom, DateTo, Code).Tables[0];
                 var db = new SQLiteConnection("Data Source=currentCourse.db");
                 db.Open();
@@ -180,9 +179,8 @@ namespace CourseServer
                     cmd.ExecuteNonQuery();
                 }
                 db.Close();
-            }
 
-               
+            } catch { }
         }
 
         private void check(string cod)
