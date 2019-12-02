@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.labelValHdr = new System.Windows.Forms.Label();
             this.btnSell = new System.Windows.Forms.Button();
             this.labelUsdHdr = new System.Windows.Forms.Label();
@@ -46,6 +46,14 @@
             this.labelWalEurValue = new System.Windows.Forms.Label();
             this.labelWalEurHdr = new System.Windows.Forms.Label();
             this.gbCourse = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.rbEUR = new System.Windows.Forms.RadioButton();
+            this.rbUSD = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.rBMonth = new System.Windows.Forms.RadioButton();
+            this.rBYear = new System.Windows.Forms.RadioButton();
+            this.rBWeek = new System.Windows.Forms.RadioButton();
+            this.chartChanges = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label1 = new System.Windows.Forms.Label();
             this.gbWallet = new System.Windows.Forms.GroupBox();
             this.gbExch = new System.Windows.Forms.GroupBox();
@@ -58,16 +66,12 @@
             this.cbSell = new System.Windows.Forms.ComboBox();
             this.tbBuyValue = new System.Windows.Forms.TextBox();
             this.cbBuy = new System.Windows.Forms.ComboBox();
-            this.chartChanges = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.rBWeek = new System.Windows.Forms.RadioButton();
-            this.rBYear = new System.Windows.Forms.RadioButton();
-            this.rBMonth = new System.Windows.Forms.RadioButton();
             this.gbCourse.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartChanges)).BeginInit();
             this.gbWallet.SuspendLayout();
             this.gbExch.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartChanges)).BeginInit();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelValHdr
@@ -208,6 +212,7 @@
             // 
             // gbCourse
             // 
+            this.gbCourse.Controls.Add(this.groupBox2);
             this.gbCourse.Controls.Add(this.groupBox1);
             this.gbCourse.Controls.Add(this.chartChanges);
             this.gbCourse.Controls.Add(this.label1);
@@ -222,6 +227,111 @@
             this.gbCourse.Size = new System.Drawing.Size(509, 461);
             this.gbCourse.TabIndex = 13;
             this.gbCourse.TabStop = false;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.rbEUR);
+            this.groupBox2.Controls.Add(this.rbUSD);
+            this.groupBox2.Location = new System.Drawing.Point(372, 351);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(131, 98);
+            this.groupBox2.TabIndex = 9;
+            this.groupBox2.TabStop = false;
+            // 
+            // rbEUR
+            // 
+            this.rbEUR.AutoSize = true;
+            this.rbEUR.Location = new System.Drawing.Point(6, 42);
+            this.rbEUR.Name = "rbEUR";
+            this.rbEUR.Size = new System.Drawing.Size(48, 17);
+            this.rbEUR.TabIndex = 1;
+            this.rbEUR.Tag = "";
+            this.rbEUR.Text = "EUR";
+            this.rbEUR.UseVisualStyleBackColor = true;
+            this.rbEUR.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // rbUSD
+            // 
+            this.rbUSD.AutoSize = true;
+            this.rbUSD.Checked = true;
+            this.rbUSD.Location = new System.Drawing.Point(6, 19);
+            this.rbUSD.Name = "rbUSD";
+            this.rbUSD.Size = new System.Drawing.Size(48, 17);
+            this.rbUSD.TabIndex = 0;
+            this.rbUSD.TabStop = true;
+            this.rbUSD.Tag = "";
+            this.rbUSD.Text = "USD";
+            this.rbUSD.UseVisualStyleBackColor = true;
+            this.rbUSD.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.rBMonth);
+            this.groupBox1.Controls.Add(this.rBYear);
+            this.groupBox1.Controls.Add(this.rBWeek);
+            this.groupBox1.Location = new System.Drawing.Point(371, 245);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(132, 99);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            // 
+            // rBMonth
+            // 
+            this.rBMonth.AutoSize = true;
+            this.rBMonth.Location = new System.Drawing.Point(6, 42);
+            this.rBMonth.Name = "rBMonth";
+            this.rBMonth.Size = new System.Drawing.Size(73, 17);
+            this.rBMonth.TabIndex = 2;
+            this.rBMonth.TabStop = true;
+            this.rBMonth.Text = "За месяц";
+            this.rBMonth.UseVisualStyleBackColor = true;
+            this.rBMonth.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // rBYear
+            // 
+            this.rBYear.AutoSize = true;
+            this.rBYear.Location = new System.Drawing.Point(6, 65);
+            this.rBYear.Name = "rBYear";
+            this.rBYear.Size = new System.Drawing.Size(58, 17);
+            this.rBYear.TabIndex = 1;
+            this.rBYear.TabStop = true;
+            this.rBYear.Text = "За год";
+            this.rBYear.UseVisualStyleBackColor = true;
+            this.rBYear.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // rBWeek
+            // 
+            this.rBWeek.AutoSize = true;
+            this.rBWeek.Checked = true;
+            this.rBWeek.Location = new System.Drawing.Point(6, 19);
+            this.rBWeek.Name = "rBWeek";
+            this.rBWeek.Size = new System.Drawing.Size(79, 17);
+            this.rBWeek.TabIndex = 0;
+            this.rBWeek.TabStop = true;
+            this.rBWeek.Text = "За неделю";
+            this.rBWeek.UseVisualStyleBackColor = true;
+            this.rBWeek.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
+            // 
+            // chartChanges
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chartChanges.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chartChanges.Legends.Add(legend1);
+            this.chartChanges.Location = new System.Drawing.Point(37, 245);
+            this.chartChanges.Name = "chartChanges";
+            this.chartChanges.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Fire;
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "USD";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "EUR";
+            this.chartChanges.Series.Add(series1);
+            this.chartChanges.Series.Add(series2);
+            this.chartChanges.Size = new System.Drawing.Size(328, 204);
+            this.chartChanges.TabIndex = 7;
+            this.chartChanges.Text = "chart1";
             // 
             // label1
             // 
@@ -363,75 +473,6 @@
             this.cbBuy.TabIndex = 2;
             this.cbBuy.SelectedIndexChanged += new System.EventHandler(this.cbBuy_SelectedIndexChanged);
             // 
-            // chartChanges
-            // 
-            chartArea3.Name = "ChartArea1";
-            this.chartChanges.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.chartChanges.Legends.Add(legend3);
-            this.chartChanges.Location = new System.Drawing.Point(37, 245);
-            this.chartChanges.Name = "chartChanges";
-            this.chartChanges.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Fire;
-            series5.ChartArea = "ChartArea1";
-            series5.Legend = "Legend1";
-            series5.Name = "USD";
-            series6.ChartArea = "ChartArea1";
-            series6.Legend = "Legend1";
-            series6.Name = "EUR";
-            this.chartChanges.Series.Add(series5);
-            this.chartChanges.Series.Add(series6);
-            this.chartChanges.Size = new System.Drawing.Size(328, 204);
-            this.chartChanges.TabIndex = 7;
-            this.chartChanges.Text = "chart1";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.rBMonth);
-            this.groupBox1.Controls.Add(this.rBYear);
-            this.groupBox1.Controls.Add(this.rBWeek);
-            this.groupBox1.Location = new System.Drawing.Point(371, 245);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(132, 99);
-            this.groupBox1.TabIndex = 8;
-            this.groupBox1.TabStop = false;
-            // 
-            // rBWeek
-            // 
-            this.rBWeek.AutoSize = true;
-            this.rBWeek.Checked = true;
-            this.rBWeek.Location = new System.Drawing.Point(6, 19);
-            this.rBWeek.Name = "rBWeek";
-            this.rBWeek.Size = new System.Drawing.Size(79, 17);
-            this.rBWeek.TabIndex = 0;
-            this.rBWeek.TabStop = true;
-            this.rBWeek.Text = "За неделю";
-            this.rBWeek.UseVisualStyleBackColor = true;
-            this.rBWeek.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
-            // 
-            // rBYear
-            // 
-            this.rBYear.AutoSize = true;
-            this.rBYear.Location = new System.Drawing.Point(6, 65);
-            this.rBYear.Name = "rBYear";
-            this.rBYear.Size = new System.Drawing.Size(58, 17);
-            this.rBYear.TabIndex = 1;
-            this.rBYear.TabStop = true;
-            this.rBYear.Text = "За год";
-            this.rBYear.UseVisualStyleBackColor = true;
-            this.rBYear.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
-            // 
-            // rBMonth
-            // 
-            this.rBMonth.AutoSize = true;
-            this.rBMonth.Location = new System.Drawing.Point(6, 42);
-            this.rBMonth.Name = "rBMonth";
-            this.rBMonth.Size = new System.Drawing.Size(73, 17);
-            this.rBMonth.TabIndex = 2;
-            this.rBMonth.TabStop = true;
-            this.rBMonth.Text = "За месяц";
-            this.rBMonth.UseVisualStyleBackColor = true;
-            this.rBMonth.CheckedChanged += new System.EventHandler(this.rBWeek_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -447,13 +488,15 @@
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.gbCourse.ResumeLayout(false);
             this.gbCourse.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartChanges)).EndInit();
             this.gbWallet.ResumeLayout(false);
             this.gbWallet.PerformLayout();
             this.gbExch.ResumeLayout(false);
             this.gbExch.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartChanges)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -491,5 +534,8 @@
         private System.Windows.Forms.RadioButton rBMonth;
         private System.Windows.Forms.RadioButton rBYear;
         private System.Windows.Forms.RadioButton rBWeek;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton rbEUR;
+        private System.Windows.Forms.RadioButton rbUSD;
     }
 }

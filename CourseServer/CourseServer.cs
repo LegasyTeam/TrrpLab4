@@ -63,8 +63,6 @@ namespace CourseServer
             Uri address = new Uri(s);
             BasicHttpBinding binding = new BasicHttpBinding();
             Type contract = typeof(ICourseServer);
-            Properties.Settings.Default.DispatcherAddress = "26.29.23.251";
-            Properties.Settings.Default.DispatcherPort = 7000;
             ServiceHost host = new ServiceHost(typeof(CourseServer));
             host.AddServiceEndpoint(contract, binding, address);
             host.Open();
@@ -77,6 +75,7 @@ namespace CourseServer
             //Console.WriteLine("Hello Dispatcher started!");
             try
             {
+                //Console.WriteLine(Properties.Settings.Default.DispatcherAddress + " " + Properties.Settings.Default.DispatcherPort);
                 IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(Properties.Settings.Default.DispatcherAddress), Properties.Settings.Default.DispatcherPort);
 
                 Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

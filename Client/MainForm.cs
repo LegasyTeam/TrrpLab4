@@ -89,7 +89,9 @@ namespace WindowsFormsApp1
             InitializeAddress();
             InitializeCourses();
             InitializeWallet();
-            GetGraphic(rBWeek);
+            rbUSD.Tag = 1;
+            rbEUR.Tag = 2;
+            GetGraphic();
             cbBuy.SelectedIndex = 0;
             cbSell.SelectedIndex = 0;
             //MessageBox.Show(Address);
@@ -293,9 +295,18 @@ namespace WindowsFormsApp1
         {
             tbBuyValue_TextChanged(sender, e);
         }
-
-        private void GetGraphic(RadioButton rb)
+        private RadioButton rbchecked(GroupBox gb)
         {
+            foreach (RadioButton r in gb.Controls)
+                if (r.Checked)
+                    return r;
+            return null;
+        }
+
+        private void GetGraphic()
+        {
+            RadioButton rb = rbchecked(groupBox1);
+            int valuteindex = (int)rbchecked(groupBox2).Tag;
             DateTime From = new DateTime(), To = new DateTime();
             switch (rb.Name)
             {
@@ -325,28 +336,42 @@ namespace WindowsFormsApp1
             ICourseServer cs = factory.CreateChannel();
             var res = JsonConvert.DeserializeObject<DataTable>(cs.GetCurrenttCourse(From, To));
 
+            chartChanges.Series["USD"].Points.Clear();
+            chartChanges.Series["EUR"].Points.Clear();
+            double min = 999;
+            double max = 0;
             for (int i = 0; i < res.Rows.Count; i++)
             {
                 var row = res.Rows[i];
-                if (row.ItemArray.GetValue(0).Equals("1"))
+                if (row.ItemArray.GetValue(0).Equals("1") && valuteindex == 1)
                 {
                     var date  = DateTime.Parse((string)row.ItemArray.GetValue(1)).ToString("MM-dd");
                     var curse = Math.Round(double.Parse((string)row.ItemArray.GetValue(2)),2);
+                    if (curse < min)
+                        min = curse;
+                    else if (curse > max)
+                        max = curse;
                     chartChanges.Series["USD"].Points.AddXY(date, curse);
                 }
-                else
+                if (row.ItemArray.GetValue(0).Equals("2") && valuteindex==2 )
                 {
                     var date = DateTime.Parse((string)row.ItemArray.GetValue(1)).ToString("MM-dd");
                     var curse = Math.Round(double.Parse((string)row.ItemArray.GetValue(2)), 2);
+                    if (curse < min)
+                        min = curse;
+                    else if (curse > max)
+                        max = curse;
                     chartChanges.Series["EUR"].Points.AddXY(date, curse);
                 }
             }
+            chartChanges.ChartAreas[0].AxisY.Minimum = min-1;
+            chartChanges.ChartAreas[0].AxisY.Maximum = max+1;
         }
 
         private void rBWeek_CheckedChanged(object sender, EventArgs e)
         {
-            var rb = (RadioButton)sender;
-            GetGraphic(rb);
+            //var rb = (RadioButton)sender;
+            GetGraphic();
 
         }
     }
