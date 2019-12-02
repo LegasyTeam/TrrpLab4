@@ -16,7 +16,7 @@ namespace WindowsFormsApp1
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm("c5a7c0d5_144e_11ea_bb7c_08606e6ce1c1", ""));
+            Application.Run(new AuthForm());
         }
     }
 }

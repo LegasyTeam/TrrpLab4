@@ -104,9 +104,9 @@ namespace WindowsFormsApp1
                     if (InitializeCourses())
                         if (InitializeWallet())
                             fail = false;
-                        else MessageBox.Show("Сервер недоступен!");
-                    else MessageBox.Show("Сервер недоступен!");
-                else MessageBox.Show("Невозможно получить сервер от диспетчера!");
+                        else MsgBox.Show("Сервер недоступен!");
+                    else MsgBox.Show("Сервер недоступен!");
+                else MsgBox.Show("Невозможно получить сервер от диспетчера!");
             }
         }
 
@@ -268,7 +268,7 @@ namespace WindowsFormsApp1
                 ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
                 ICourseServer cs = factory.CreateChannel();
                 bool provValute = true;
-                if (cbBuy.SelectedItem == "EUR")
+                if (cbBuy.SelectedIndex == 1)
                     provValute = false;
                 var userTran = new UserTransaction() { Dollar = provValute, Count = (int.Parse(tbBuyValue.Text) * 100), Token = token };
                 string message = cs.BuyValute(JsonConvert.SerializeObject(userTran));
@@ -301,7 +301,7 @@ namespace WindowsFormsApp1
                 ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
                 ICourseServer cs = factory.CreateChannel();
                 bool provValute = true;
-                if (cbSell.SelectedItem == "EUR")
+                if (cbSell.SelectedIndex == 1)
                     provValute = false;
                 var userTran = new UserTransaction() { Dollar = provValute, Count = (int.Parse(tbSellValue.Text) * 100), Token = token };
                 string message = cs.SellValute(JsonConvert.SerializeObject(userTran));
