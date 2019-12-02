@@ -51,12 +51,12 @@ namespace Dispatcher
             if (CourseServers.ContainsKey(ep))
             {
                 CourseServers[ep] = DateTime.Now;
-                return "updated";
+                return " updated";
             }
             else
             {
                 CourseServers.Add(ep, DateTime.Now);
-                return "added into server list";
+                return " added into server list";
             }
         }
 
@@ -90,14 +90,15 @@ namespace Dispatcher
             }
             while (handler.Available > 0);
             EndPoint REP = handler.RemoteEndPoint;
-            Console.WriteLine("(" + DateTime.Now.ToShortTimeString() + ")(" + REP.ToString() + ")" + ": " + builder.ToString());
+            Console.Write("(" + DateTime.Now.ToShortTimeString() + ")");
             string message;
             if (builder.ToString().StartsWith("CourseServer"))
             {
                 IPEndPoint IEP=null;
                 if (getIEP(REP, builder.ToString(), ref IEP))
-                    message = addServ(IEP);
+                    message = IEP.ToString()+ addServ(IEP);
                 else message = "incorrect data";
+                Console.WriteLine(" "+message);
                 //Console.WriteLine(REP.ToString() + " inserted into CourseServerAdded");
             }
             else if (builder.ToString() == "Client")
@@ -107,13 +108,21 @@ namespace Dispatcher
                 // отправляем ответ
                 EndPoint ep = getServ();
                 if (ep is null)
+                {
+                    Console.WriteLine(" Client can't get server");
                     message = "0";
-                else message = ep.ToString();
+                }
+                else
+                {
+                    message = ep.ToString();
+                    Console.WriteLine("Client taked " + message);
+                }
             }
             else
             {
                 //Console.WriteLine("Неизвестное подключение");
                 message = "invalid request";
+                Console.WriteLine(" " + message);
             }
             data = Encoding.Unicode.GetBytes(message);
             handler.Send(data);

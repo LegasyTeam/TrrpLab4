@@ -14,7 +14,6 @@ using System.Timers;
 using System.Configuration;
 using System.ServiceModel;
 using Newtonsoft.Json;
-
 namespace WindowsFormsApp1
 {
     public partial class MainForm : Form
@@ -24,6 +23,7 @@ namespace WindowsFormsApp1
         private string token { get; set; }
         private int usdRub;
         private int eurRub;
+        //private System.Timers.Timer reconnecttimer;
         public int UsdRub
         {
             get { return usdRub; }
@@ -86,32 +86,53 @@ namespace WindowsFormsApp1
             InitializeComponent();
             this.login = _login;
             this.token = _token;
-            InitializeAddress();
-            InitializeCourses();
-            InitializeWallet();
             rbUSD.Tag = 1;
             rbEUR.Tag = 2;
+            FullConnect();
             GetGraphic();
             cbBuy.SelectedIndex = 0;
             cbSell.SelectedIndex = 0;
             //MessageBox.Show(Address);
         }
 
-
-
-        private void InitializeCourses()
+        private void FullConnect()
         {
-            Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
-            BasicHttpBinding binding = new BasicHttpBinding();
-            EndpointAddress ep = new EndpointAddress(address);
-            ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
-            ICourseServer cs = factory.CreateChannel();
-            var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
-
-            UsdRub = Convert.ToInt32(cs.GetCurrentCourse(true) * 100);
-            EurRub = Convert.ToInt32(cs.GetCurrentCourse(false) * 100);
+            bool fail=true;
+            while (fail)
+            {
+                if (InitializeAddress())
+                    if (InitializeCourses())
+                        if (InitializeWallet())
+                            fail = false;
+                        else MessageBox.Show("Сервер недоступен!");
+                    else MessageBox.Show("Сервер недоступен!");
+                else MessageBox.Show("Невозможно получить сервер от диспетчера!");
+            }
         }
-        private void InitializeAddress()
+
+
+
+        private bool InitializeCourses()
+        {
+            try
+            {
+                Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+                BasicHttpBinding binding = new BasicHttpBinding();
+                EndpointAddress ep = new EndpointAddress(address);
+                ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+                ICourseServer cs = factory.CreateChannel();
+                var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
+
+                UsdRub = Convert.ToInt32(cs.GetCurrentCourse(true) * 100);
+                EurRub = Convert.ToInt32(cs.GetCurrentCourse(false) * 100);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        private bool InitializeAddress()
         {
             try
             {
@@ -134,29 +155,40 @@ namespace WindowsFormsApp1
                 Address = builder.ToString();            // закрываем сокет
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
+                if (Address == "0")
+                    return false;
+                return true;
             }
             catch
             {
-                MessageBox.Show("Не удалось поключиться к диспетчеру, проверьте соединение.");
+                return false;
             }
         }
-        private void InitializeWallet()
+        private bool InitializeWallet()
         {
-            //имитация получения с сервера
-            Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
-            BasicHttpBinding binding = new BasicHttpBinding();
-            EndpointAddress ep = new EndpointAddress(address);
-            ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
-            ICourseServer cs = factory.CreateChannel();
-            var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
-            var list = JsonConvert.DeserializeObject<List<int>> (cs.GetBalance(token));
-            int RubValue = list[0];
-            int UsdValue = list[2];
-            int EurValue = list[1];
-            //получение с сервера
-            RubWallet = RubValue;
-            UsdWallet = UsdValue;
-            EurWallet = EurValue;
+            try
+            {
+                //имитация получения с сервера
+                Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
+                BasicHttpBinding binding = new BasicHttpBinding();
+                EndpointAddress ep = new EndpointAddress(address);
+                ChannelFactory<ICourseServer> factory = new ChannelFactory<ICourseServer>(binding, ep);
+                ICourseServer cs = factory.CreateChannel();
+                var userTran = new UserTransaction() { Dollar = true, Count = int.Parse(tbSellValue.Text), Token = token };
+                var list = JsonConvert.DeserializeObject<List<int>>(cs.GetBalance(token));
+                int RubValue = list[0];
+                int UsdValue = list[2];
+                int EurValue = list[1];
+                //получение с сервера
+                RubWallet = RubValue;
+                UsdWallet = UsdValue;
+                EurWallet = EurValue;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -256,7 +288,7 @@ namespace WindowsFormsApp1
                 MessageBox.Show(message);
 
             }
-             catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+             catch (Exception ex) { FullConnect(); }
         }
 
         private void btnSell_Click(object sender, EventArgs e)
@@ -288,7 +320,10 @@ namespace WindowsFormsApp1
                 }
                 MessageBox.Show(message);
             }
-            catch (Exception ex) { MessageBox.Show(ex.ToString()); }
+            catch (Exception ex)
+            {
+                FullConnect();
+            }
         }
 
         private void cbBuy_SelectedIndexChanged(object sender, EventArgs e)
@@ -329,6 +364,7 @@ namespace WindowsFormsApp1
                     To = DateTime.Now.AddDays(-1);
                     break;
             }
+            //MessageBox.Show(Address);
             Uri address = new Uri(@"http://" + Address + @"/ICourseServer");
             BasicHttpBinding binding = new BasicHttpBinding();
             EndpointAddress ep = new EndpointAddress(address);
@@ -371,7 +407,14 @@ namespace WindowsFormsApp1
         private void rBWeek_CheckedChanged(object sender, EventArgs e)
         {
             //var rb = (RadioButton)sender;
-            GetGraphic();
+            try
+            {
+                GetGraphic();
+            }
+            catch
+            {
+                FullConnect();
+            }
 
         }
     }
