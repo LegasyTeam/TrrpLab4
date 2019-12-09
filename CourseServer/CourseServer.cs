@@ -151,7 +151,30 @@ namespace CourseServer
             }
             return db;
         }
-        
+
+        private InsertToDBCurrCurse(DateTime DateFrom, DateTime DateTo, string Code)
+        {
+            int k = 0;
+            if (Code == "R01239")
+                k = 1;
+            var course = GetCurrCurse(k);
+
+
+            var db = new SQLiteConnection("Data Source=currentCourse.db");
+            db.Open();
+            k = (DateTo - DateFrom).TotalDays;
+
+            for (int i = 0; i < k; i++)
+            {
+                SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select rowid From Valute Where code = @code), @date, @curse)", db);
+                cmd.Parameters.Add(new SQLiteParameter("@code", Code));
+                cmd.Parameters.Add(new SQLiteParameter("@date", DateFrom));
+                cmd.Parameters.Add(new SQLiteParameter("@curse", course));
+                cmd.ExecuteNonQuery();
+                DateFrom = DateFrom.AddDays(1);
+            }
+        }
+
         private double GetCurrCurse(int cod)
         {
             var db = new SQLiteConnection("Data Source=currentCourse.db");
@@ -168,18 +191,29 @@ namespace CourseServer
                 var data = di.GetCursDynamic(DateFrom, DateTo, Code).Tables[0];
                 var db = new SQLiteConnection("Data Source=currentCourse.db");
                 db.Open();
-                for (int i = 0; i < data.Rows.Count; i++)
+
+                if (data.Rows.Count != 0)
                 {
-                    var row = data.Rows[i];
-                    SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select rowid From Valute Where code = @code), @date, @curse)", db);
-                    cmd.Parameters.Add(new SQLiteParameter("@code", Code));
-                    cmd.Parameters.Add(new SQLiteParameter("@date", (DateTime)row.ItemArray.GetValue(0)));
-                    cmd.Parameters.Add(new SQLiteParameter("@curse", (decimal)row.ItemArray.GetValue(3)));
-                    cmd.ExecuteNonQuery();
+                    for (int i = 0; i < data.Rows.Count; i++)
+                    {
+                        var row = data.Rows[i];
+                        SQLiteCommand cmd = new SQLiteCommand("Insert into Curses (id_valute, date, curse) Values ((Select rowid From Valute Where code = @code), @date, @curse)", db);
+                        cmd.Parameters.Add(new SQLiteParameter("@code", Code));
+                        cmd.Parameters.Add(new SQLiteParameter("@date", (DateTime)row.ItemArray.GetValue(0)));
+                        cmd.Parameters.Add(new SQLiteParameter("@curse", (decimal)row.ItemArray.GetValue(3)));
+                        cmd.ExecuteNonQuery();
+                    }
                 }
+                else
+                {
+                    InsertToDBCurrCurse(DateFrom, DateTo, Code);
+                }
+                
                 db.Close();
 
-            } catch { }
+            } catch {
+                InsertToDBCurrCurse(DateFrom, DateTo, Code);
+            }
         }
 
         private void check(string cod)
