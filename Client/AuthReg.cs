@@ -7,15 +7,34 @@ using System.Configuration;
 using System.Security.Cryptography;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 
 namespace WindowsFormsApp1
 {
     static class AuthReg
     {
-        private static string GetAddress ()
+        private static string GetAddress()
         {
-            return "http://test";
-            //получаем у диспетчера адрес сервера авторизации
+            string host = ConfigurationManager.AppSettings["mainAuthHost"];
+            try
+            {
+                WebRequest request = WebRequest.Create(host + "/handle.php");
+                request.Method = "GET";
+                WebResponse response = request.GetResponse();
+                string res = "";
+                using (Stream stream = response.GetResponseStream())
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        res = reader.ReadToEnd();
+                    }
+                }
+                response.Close();
+                if (res == "0")
+                    return host;
+            }
+            catch { return "host:nohost"; }
+            return "host:nohost";   
         }
         private static string CalcHash(string path)
         {
@@ -28,58 +47,63 @@ namespace WindowsFormsApp1
         public static string Auth(string login, string password)
         {
             string host = GetAddress();
-            Guid prefix;
-            try
+            if (host != "host:nohost")
             {
-                WebRequest request = WebRequest.Create(host + "/handle.php?action=getprefix&login=" + login);
-                request.Method = "GET";
-                WebResponse response = request.GetResponse();
-                string res = "";
-                using (Stream stream = response.GetResponseStream())
+                Guid prefix;
+                try
                 {
-                    using (StreamReader reader = new StreamReader(stream))
+                    WebRequest request = WebRequest.Create(host + "/handle.php?action=getprefix&login=" + login);
+                    request.Method = "GET";
+                    WebResponse response = request.GetResponse();
+                    string res = "";
+                    using (Stream stream = response.GetResponseStream())
                     {
-                        res = reader.ReadToEnd();
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            res = reader.ReadToEnd();
+                        }
                     }
+                    response.Close();
+                    if (res == "incorrect_login")
+                        return "incorrect_login";
+                    else if (res == "0")
+                        return "";
+                    else
+                        prefix = Guid.Parse(res);
                 }
-                response.Close();
-                if (res == "incorrect_login")
-                    return "incorrect_login";
-                else if (res == "0")
-                    return "";
-                else
-                    prefix = Guid.Parse(res);
-            }
-            catch
-            {
-                return "";
-            }
-            try
-            {
-                string hash = CalcHash(password + prefix.ToString());
-                WebRequest request = WebRequest.Create(host + "/handle.php?action=auth&login=" + login + "&prefix=" + prefix + "&hash=" + hash);
-                request.Method = "GET";
-                WebResponse response = request.GetResponse();
-                string res = "";
-                using (Stream stream = response.GetResponseStream())
+                catch
                 {
-                    using (StreamReader reader = new StreamReader(stream))
-                    {
-                        res = reader.ReadToEnd();
-                    }
-                }
-                response.Close();
-                if (res == "auth_not_succ")
-                    return "auth_not_succ";
-                else if (res == "auth_error")
                     return "";
-                else
-                    return res;
+                }
+                try
+                {
+                    string hash = CalcHash(password + prefix.ToString());
+                    WebRequest request = WebRequest.Create(host + "/handle.php?action=auth&login=" + login + "&prefix=" + prefix + "&hash=" + hash);
+                    request.Method = "GET";
+                    WebResponse response = request.GetResponse();
+                    string res = "";
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            res = reader.ReadToEnd();
+                        }
+                    }
+                    response.Close();
+                    if (res == "auth_not_succ")
+                        return "auth_not_succ";
+                    else if (res == "auth_error")
+                        return "";
+                    else
+                        return res;
+                }
+                catch
+                {
+                    return "";
+                }
             }
-            catch
-            {
-                return "";
-            }
+            else
+                return "no_server";
         }
         public static string Reg(string login, string password)
         {

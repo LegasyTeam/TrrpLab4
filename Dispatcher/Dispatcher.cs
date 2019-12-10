@@ -13,14 +13,12 @@ namespace Dispatcher
     class Dispatcher
     {
         private  Dictionary<EndPoint, DateTime> CourseServers = new Dictionary<EndPoint, DateTime>();
-        private int port = 7000; // порт для приема входящих запросов
         private IPEndPoint ipPoint;
         private Thread ListenThread;
-        private int LifeTimeToDrop = 10;
-        private int CleanUpPeriodMilliseconds=20000;
+        private int currentservnumber = 0;//индекс сервера из списка серверов, ip которого диспетчер вернет следующему клиенту
         private bool listening=true;//когда будет false, диспатчер перестанет слушать сообщения
         private System.Timers.Timer CleanUpTimer;
-        private IPAddress getmyip()
+        private IPAddress getmyip()//ищем IPv4
         {
             foreach (IPAddress a in Dns.GetHostAddresses(Dns.GetHostName()))
             {
@@ -33,34 +31,48 @@ namespace Dispatcher
         }
         public Dispatcher()
         {
-            IPAddress adr = getmyip();
-            ipPoint = new IPEndPoint(adr, port);
+            ipPoint = new IPEndPoint(getmyip(), Properties.Settings.Default.port);
             ListenThread = new Thread(Listen);
             CleanUpTimer = new System.Timers.Timer();
             CleanUpTimer.Elapsed += RemoveNotRespondingServers;
-            CleanUpTimer.Interval = CleanUpPeriodMilliseconds;
+            CleanUpTimer.Interval = Properties.Settings.Default.CleanUpPeriodMilliseconds;
             Console.WriteLine("Dispatcher started: " + ipPoint.ToString());
         }
         public EndPoint getServ()
         {
+            if (currentservnumber == int.MaxValue)
+                currentservnumber = 0;//на случай переполнения
             if (CourseServers.Count > 0)
-                return CourseServers.First().Key;
-            return null;
+                return CourseServers.ElementAt(currentservnumber++ % CourseServers.Count).Key;
+            else return null;
         }
-        public void addServ(EndPoint ep)
+        public string addServ(IPEndPoint ep)
         {
             if (CourseServers.ContainsKey(ep))
+            {
                 CourseServers[ep] = DateTime.Now;
-            else CourseServers.Add(ep, DateTime.Now);
+                return " updated";
+            }
+            else
+            {
+                CourseServers.Add(ep, DateTime.Now);
+                return " added into server list";
+            }
         }
 
         private void RemoveNotRespondingServers(object sender, ElapsedEventArgs e)
         {
+            List<EndPoint> eplist = new List<EndPoint>();
             foreach (var a in CourseServers)
             {
-                if (a.Value.Second > LifeTimeToDrop)
-                    CourseServers.Remove(a.Key);//так можно?
+                if ((DateTime.Now-a.Value).TotalSeconds > Properties.Settings.Default.LifeTimeToDrop)
+                {
+                    eplist.Add(a.Key);
+                    Console.WriteLine(a.Key.ToString()+ " time out "+ (DateTime.Now - a.Value).Seconds);
+                }
             }
+            foreach (EndPoint ep in eplist)
+                CourseServers.Remove(ep);
         }
 
         private void AcceptConnection(Object ohandler)
@@ -78,28 +90,39 @@ namespace Dispatcher
             }
             while (handler.Available > 0);
             EndPoint REP = handler.RemoteEndPoint;
-            Console.WriteLine("(" + DateTime.Now.ToShortTimeString() + ")(" + REP.ToString() + ")" + ": " + builder.ToString());
+            Console.Write("(" + DateTime.Now.ToShortTimeString() + ")");
             string message;
-            if (builder.ToString() == "CourseServer")
+            if (builder.ToString().StartsWith("CourseServer"))
             {
-                addServ(REP);
-                Console.WriteLine(REP.ToString() + " inserted into CourseServerAdded");
-                message = "Your ip added into";
+                IPEndPoint IEP=null;
+                if (getIEP(REP, builder.ToString(), ref IEP))
+                    message = IEP.ToString()+ addServ(IEP);
+                else message = "incorrect data";
+                Console.WriteLine(" "+message);
+                //Console.WriteLine(REP.ToString() + " inserted into CourseServerAdded");
             }
             else if (builder.ToString() == "Client")
             {
                 //CourseServers.Add(handler.RemoteEndPoint, DateTime.Now);
-                Console.WriteLine("NewClient");
+                //Console.WriteLine("NewClient");
                 // отправляем ответ
                 EndPoint ep = getServ();
                 if (ep is null)
+                {
+                    Console.WriteLine(" Client can't get server");
                     message = "0";
-                else message = ep.ToString();
+                }
+                else
+                {
+                    message = ep.ToString();
+                    Console.WriteLine("Client taked " + message);
+                }
             }
             else
             {
-                Console.WriteLine("Неизвестное подключение");
+                //Console.WriteLine("Неизвестное подключение");
                 message = "invalid request";
+                Console.WriteLine(" " + message);
             }
             data = Encoding.Unicode.GetBytes(message);
             handler.Send(data);
@@ -132,10 +155,24 @@ namespace Dispatcher
                 Console.WriteLine(ex.Message);
             }
         }
+
+        private bool getIEP(EndPoint ep,string message, ref IPEndPoint IEP)
+        {
+            try
+            {
+                IEP=new IPEndPoint(IPAddress.Parse(ep.ToString().Split(':')[0]), int.Parse(message.Remove(0, 12)));
+                return true; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
         public void Start()
         {
             ListenThread.Start();
-
+            CleanUpTimer.Start();
         }
     }
 }

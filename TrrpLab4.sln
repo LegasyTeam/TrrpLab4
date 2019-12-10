@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dispatcher", "Dispatcher\Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourseServer", "CourseServer\CourseServer.csproj", "{B6884F12-6BD4-4C7B-B97A-AF0EBA90BFAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "useless", "useless\useless.csproj", "{2059D4A1-E9F3-4E41-B717-74071929E3E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeClient", "FakeClient\FakeClient.csproj", "{7AD3AB7F-C829-4C44-8A0B-BE160B7ED6EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{B6884F12-6BD4-4C7B-B97A-AF0EBA90BFAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6884F12-6BD4-4C7B-B97A-AF0EBA90BFAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6884F12-6BD4-4C7B-B97A-AF0EBA90BFAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2059D4A1-E9F3-4E41-B717-74071929E3E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2059D4A1-E9F3-4E41-B717-74071929E3E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2059D4A1-E9F3-4E41-B717-74071929E3E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2059D4A1-E9F3-4E41-B717-74071929E3E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AD3AB7F-C829-4C44-8A0B-BE160B7ED6EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AD3AB7F-C829-4C44-8A0B-BE160B7ED6EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AD3AB7F-C829-4C44-8A0B-BE160B7ED6EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AD3AB7F-C829-4C44-8A0B-BE160B7ED6EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
